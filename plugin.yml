@@ -1,0 +1,8 @@
+name: Spectate
+main: com.Chipmunk9998.Spectate.Spectate
+version: 1.3.1
+commands:
+    spectate:
+        description: Lets you spectate another user
+    spectateoff:
+        description: Stops you from spectating and returns you back to your original location
