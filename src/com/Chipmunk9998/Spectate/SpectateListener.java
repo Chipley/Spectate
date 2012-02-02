@@ -81,6 +81,7 @@ public class SpectateListener implements Listener {
 		
 	}
 	
+	//Doesn't work
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		
@@ -155,6 +156,7 @@ public class SpectateListener implements Listener {
 		
 	}
 	
+	//Doesn't work
 	@EventHandler
 	public void onEnitityDamage(EntityDamageEvent event) {
 		
@@ -173,6 +175,7 @@ public class SpectateListener implements Listener {
 		}
 	}
 
+	//Doesn't work
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		
