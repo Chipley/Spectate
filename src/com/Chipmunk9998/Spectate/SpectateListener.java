@@ -1,10 +1,6 @@
 package com.Chipmunk9998.Spectate;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.server.Packet29DestroyEntity;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,8 +17,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class SpectateListener implements Listener {
 
 	public Spectate plugin;
-	
-	public Map<Player, Boolean> quitAndSpectating = new HashMap<Player, Boolean>();
 	
 	int varx;
 	int vayr;
@@ -84,8 +78,6 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		
-		System.out.println(event.getPlayer());
-		
 		if (plugin.CommandExecutor.isSpectating.get(event.getPlayer()) != null) {
 		
 			if (plugin.CommandExecutor.isSpectating.get(event.getPlayer())) {
@@ -96,7 +88,7 @@ public class SpectateListener implements Listener {
 			}
 		}
 		
-		if (plugin.CommandExecutor.isBeingSpectated.get(event.getPlayer() != null)) {
+		if (plugin.CommandExecutor.isBeingSpectated.get(event.getPlayer()) != null) {
 			
 			if (plugin.CommandExecutor.isBeingSpectated.get(event.getPlayer())) {
 				

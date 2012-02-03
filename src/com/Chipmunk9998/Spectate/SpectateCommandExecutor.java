@@ -84,8 +84,6 @@ public class SpectateCommandExecutor implements CommandExecutor{
                 		}
                 		
                 		if (targetPlayer != null) {
-                		
-                    		target.put(cmdsender, targetPlayer);
                 			
                 		if (cmdsender.getName() == targetPlayer.getName()) {
                 			
@@ -99,6 +97,22 @@ public class SpectateCommandExecutor implements CommandExecutor{
                 			if (isBeingSpectated.get(targetPlayer)) {
                 				
                 				cmdsender.sendMessage("§7Someone is currently spectating them.");
+                				return true;
+                				
+                			}
+                			
+                		}
+                		
+                		if (isBeingSpectated.get(cmdsender) != null) {
+                			
+                			if (isBeingSpectated.get(cmdsender)) {
+                				
+                				if (targetPlayer == spectator.get(cmdsender)) {
+                					
+                					cmdsender.sendMessage("§7They are currently spectating you.");
+                					return true;
+                					
+                				}
                 				
                 			}
                 			
@@ -110,6 +124,7 @@ public class SpectateCommandExecutor implements CommandExecutor{
                 			isSpectating.put(cmdsender, true);
                 			isBeingSpectated.put(targetPlayer, true);
                 			spectator.put(targetPlayer, cmdsender);
+                			target.put(cmdsender, targetPlayer);
                 			cmdsender.getPlayer().teleport(target.get(cmdsender));
                 			senderInv.put(cmdsender, cmdsender.getInventory().getContents());
                 			senderArm.put(cmdsender, cmdsender.getInventory().getArmorContents());

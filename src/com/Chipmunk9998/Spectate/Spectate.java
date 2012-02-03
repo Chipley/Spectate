@@ -1,6 +1,8 @@
 package com.Chipmunk9998.Spectate;
 
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.Packet29DestroyEntity;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -19,6 +21,33 @@ public class Spectate extends JavaPlugin {
 	final SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
 	  
 	public void onDisable() {
+		
+		for (Player players : getServer().getOnlinePlayers()) {
+			
+			if (CommandExecutor.isSpectating.get(players) != null) {
+				
+				if (CommandExecutor.isSpectating.get(players)) {
+					
+					players.sendMessage("§7You were forced to stop spectating because of a server reload.");
+					
+					players.teleport(CommandExecutor.origLocation.get(players));
+					CommandExecutor.isSpectating.put(players, false);
+					CommandExecutor.isBeingSpectated.put(CommandExecutor.target.get(players), false);
+					
+					for (Player playp : players.getWorld().getPlayers()) {
+					
+						visible(players, playp);
+						
+					}
+					
+					getNative(players).netServerHandler.sendPacket(new Packet29DestroyEntity(players.getEntityId()));
+					visible(CommandExecutor.target.get(players), players);
+					
+				}
+				
+			}
+			
+		}
 		
 		System.out.println("Spectate is disabled!");
 	    
