@@ -81,18 +81,42 @@ public class SpectateListener implements Listener {
 		
 	}
 	
-	//Doesn't work
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		
-		if (plugin.CommandExecutor.isSpectating.get(event.getPlayer().getName()) != null) {
+		System.out.println(event.getPlayer());
 		
-			if (plugin.CommandExecutor.isSpectating.get(event.getPlayer().getName())) {
+		if (plugin.CommandExecutor.isSpectating.get(event.getPlayer()) != null) {
+		
+			if (plugin.CommandExecutor.isSpectating.get(event.getPlayer())) {
 				
 				event.getPlayer().teleport(plugin.CommandExecutor.origLocation.get(event.getPlayer()));
 				plugin.CommandExecutor.isSpectating.put(event.getPlayer(), false);
 				
 			}
+		}
+		
+		if (plugin.CommandExecutor.isBeingSpectated.get(event.getPlayer() != null)) {
+			
+			if (plugin.CommandExecutor.isBeingSpectated.get(event.getPlayer())) {
+				
+				plugin.CommandExecutor.spectator.get(event.getPlayer()).sendMessage("§7You were forced to stop spectating because the person who you were spectating disconnected.");
+				
+				plugin.CommandExecutor.spectator.get(event.getPlayer()).teleport(plugin.CommandExecutor.origLocation.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
+				plugin.CommandExecutor.isSpectating.put(plugin.CommandExecutor.spectator.get(event.getPlayer()), false);
+				plugin.CommandExecutor.isBeingSpectated.put(event.getPlayer(), false);
+				
+				for (Player playp : plugin.CommandExecutor.spectator.get(event.getPlayer()).getWorld().getPlayers()) {
+				
+					plugin.visible(plugin.CommandExecutor.spectator.get(event.getPlayer()), playp);
+					
+				}
+				
+				plugin.getNative(plugin.CommandExecutor.spectator.get(event.getPlayer())).netServerHandler.sendPacket(new Packet29DestroyEntity(plugin.CommandExecutor.spectator.get(event.getPlayer()).getEntityId()));
+				plugin.visible(plugin.CommandExecutor.target.get(plugin.CommandExecutor.spectator.get(event.getPlayer())), plugin.CommandExecutor.spectator.get(event.getPlayer()));
+				
+			}
+			
 		}
 	}
 	
@@ -156,11 +180,10 @@ public class SpectateListener implements Listener {
 		
 	}
 	
-	//Doesn't work
 	@EventHandler
 	public void onEnitityDamage(EntityDamageEvent event) {
 		
-		if (event.getEntity() instanceof Player) {
+		if (event instanceof Player) {
 			
 			Player pla = (Player)event.getEntity();
 			
@@ -175,11 +198,10 @@ public class SpectateListener implements Listener {
 		}
 	}
 
-	//Doesn't work
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		
-		    if (event.getEntity() instanceof PlayerDeathEvent) {
+		    if (event instanceof PlayerDeathEvent) {
 		    	
 		    	Player pla = (Player)event.getEntity();
 		    	
