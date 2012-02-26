@@ -31,7 +31,7 @@ public class Spectate extends JavaPlugin {
 					players.setHealth(CommandExecutor.senderHealth.get(players));
 					players.getPlayer().setFoodLevel(CommandExecutor.senderHunger.get(players));
 
-					for (Player playp : players.getWorld().getPlayers()) {
+					for (Player playp : getServer().getOnlinePlayers()) {
 
 						players.showPlayer(playp);
 

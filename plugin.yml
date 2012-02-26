@@ -1,6 +1,6 @@
 name: Spectate
 main: com.Chipmunk9998.Spectate.Spectate
-version: 1.5
+version: 1.5.1
 commands:
     spectate:
         description: Lets you spectate another user

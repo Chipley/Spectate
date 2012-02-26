@@ -136,12 +136,15 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					cmdsender.getInventory().clear();
 					cmdsender.getInventory().setContents(targetPlayer.getInventory().getContents());
 					cmdsender.getInventory().setArmorContents(targetPlayer.getInventory().getArmorContents());
+					
+					for (Player player : plugin.getServer().getOnlinePlayers()) {
 
-					for (Player p : cmdsender.getWorld().getPlayers()) {
-
-						cmdsender.hidePlayer(p);
+						player.hidePlayer(cmdsender);
 
 					}
+
+					targetPlayer.hidePlayer(cmdsender);
+					cmdsender.hidePlayer(targetPlayer);
 
 					return true;
 
@@ -170,13 +173,23 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					cmdsender.getInventory().setArmorContents(senderArm.get(cmdsender));
 					cmdsender.setHealth(plugin.CommandExecutor.senderHealth.get(cmdsender));
 					cmdsender.setFoodLevel(plugin.CommandExecutor.senderHunger.get(cmdsender));
+					
+					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
+						public void run() {
 
-					for (Player playp : cmdsender.getWorld().getPlayers()) {
-
-						cmdsender.showPlayer(playp);
-
-					}
+							for (Player p : plugin.getServer().getOnlinePlayers()) {
+		
+								p.showPlayer(cmdsender);
+		
+							}
+							
+							target.get(cmdsender).showPlayer(cmdsender);
+							cmdsender.showPlayer(target.get(cmdsender));
+					
+						}
+						
+					}, 10L);
 
 					return true;
 

@@ -50,22 +50,13 @@ public class SpectateListener implements Listener {
 
 				}
 
-				if (event.getPlayer().isSprinting()) {
+				for (Player p : plugin.getServer().getOnlinePlayers()) {
 
-					plugin.CommandExecutor.spectator.get(event.getPlayer()).setSprinting(true);
-
-				}else {
-
-					plugin.CommandExecutor.spectator.get(event.getPlayer()).setSprinting(false);
+					p.hidePlayer(plugin.CommandExecutor.spectator.get(event.getPlayer()));
 
 				}
 
-				for (Player p : plugin.CommandExecutor.spectator.get(event.getPlayer()).getWorld().getPlayers()) {
-
-					plugin.CommandExecutor.spectator.get(event.getPlayer()).hidePlayer(p);
-
-				}
-
+				plugin.CommandExecutor.spectator.get(event.getPlayer()).hidePlayer(event.getPlayer());
 				event.getPlayer().hidePlayer(plugin.CommandExecutor.spectator.get(event.getPlayer()));
 
 			}
@@ -78,12 +69,13 @@ public class SpectateListener implements Listener {
 
 				event.getPlayer().teleport(plugin.CommandExecutor.target.get(event.getPlayer()));
 
-				for (Player p : event.getPlayer().getWorld().getPlayers()) {
+				for (Player p : plugin.getServer().getOnlinePlayers()) {
 
-					event.getPlayer().hidePlayer(p);
+					p.hidePlayer(event.getPlayer());
 
 				}
 
+				event.getPlayer().hidePlayer(plugin.CommandExecutor.target.get(event.getPlayer()));
 				plugin.CommandExecutor.target.get(event.getPlayer()).hidePlayer(event.getPlayer());
 
 			}
@@ -126,12 +118,6 @@ public class SpectateListener implements Listener {
 				plugin.CommandExecutor.spectator.get(event.getPlayer()).getInventory().setArmorContents(plugin.CommandExecutor.senderArm.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
 				plugin.CommandExecutor.spectator.get(event.getPlayer()).setHealth(plugin.CommandExecutor.senderHealth.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
 				plugin.CommandExecutor.spectator.get(event.getPlayer()).setFoodLevel(plugin.CommandExecutor.senderHunger.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
-
-				for (Player playp : plugin.CommandExecutor.spectator.get(event.getPlayer()).getWorld().getPlayers()) {
-
-					plugin.CommandExecutor.spectator.get(event.getPlayer()).showPlayer(playp);
-
-				}
 
 			}
 
@@ -239,7 +225,7 @@ public class SpectateListener implements Listener {
 					plugin.CommandExecutor.spectator.get(pla).setHealth(plugin.CommandExecutor.senderHealth.get(plugin.CommandExecutor.spectator.get(pla)));
 					plugin.CommandExecutor.spectator.get(pla).setFoodLevel(plugin.CommandExecutor.senderHunger.get(plugin.CommandExecutor.spectator.get(pla)));
 
-					for (Player playp : plugin.CommandExecutor.spectator.get(pla).getWorld().getPlayers()) {
+					for (Player playp : plugin.getServer().getOnlinePlayers()) {
 
 						plugin.CommandExecutor.spectator.get(pla).showPlayer(playp);
 
