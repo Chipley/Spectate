@@ -17,7 +17,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 	public Map<Player, Boolean> isSpectating = new HashMap<Player, Boolean>();
 	public Map<Player, Boolean> isBeingSpectated = new HashMap<Player, Boolean>();
-	public Map<Player, Player> spectator = new HashMap<Player, Player>();
+	public Map<Player, String> spectator = new HashMap<Player, String>();
 	public Map<Player, Player> target = new HashMap<Player, Player>();
 	public Map<Player, ItemStack[]> senderInv = new HashMap<Player, ItemStack[]>();
 	public Map<Player, ItemStack[]> senderArm = new HashMap<Player, ItemStack[]>();
@@ -58,18 +58,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 			}
 		}
 
-		if (cmd.getName().equalsIgnoreCase("spectate")) {
-
-			if (isSpectating.get(cmdsender) != null) {
-
-				if (isSpectating.get(cmdsender)) {
-
-					cmdsender.sendMessage("§7You are currently spectating someone. Type /spectateoff to stop.");
-					return true;
-
-				}
-
-			}
+		if (cmd.getName().equalsIgnoreCase("spectate") || cmd.getName().equalsIgnoreCase("spec")) {
 
 			if (args.length > 0) {
 
@@ -92,17 +81,6 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					if (isBeingSpectated.get(targetPlayer) != null) {
-
-						if (isBeingSpectated.get(targetPlayer)) {
-
-							cmdsender.sendMessage("§7Someone is currently spectating them.");
-							return true;
-
-						}
-
-					}
-
 					if (isSpectating.get(targetPlayer) != null) {
 
 						if (isSpectating.get(targetPlayer)) {
@@ -120,13 +98,41 @@ public class SpectateCommandExecutor implements CommandExecutor {
 						return true;
 
 					}
+					
+					if (targetPlayer.hasPermission("spectate.cantspectate")) {
+
+						cmdsender.sendMessage("§7They can not be spectated.");
+						return true;
+
+					}
+					
+					if (isSpectating.get(cmdsender) != null) {
+
+						if (isSpectating.get(cmdsender)) {
+
+							plugin.SpectateOff.spectateOff(cmdsender);
+
+						}
+
+					}
 
 
 					cmdsender.sendMessage("§7You are now spectating " + targetPlayer.getName());
 					origLocation.put(cmdsender, cmdsender.getLocation());
 					isSpectating.put(cmdsender, true);
 					isBeingSpectated.put(targetPlayer, true);
-					spectator.put(targetPlayer, cmdsender);
+					
+					if (spectator.get(targetPlayer) == null) {
+					
+						spectator.put(targetPlayer, cmdsender.getName());
+					
+					}else {
+						
+						spectator.put(targetPlayer, spectator.get(cmdsender) + "," + cmdsender.getName());
+						
+					}
+					
+					
 					target.put(cmdsender, targetPlayer);
 					cmdsender.getPlayer().teleport(target.get(cmdsender));
 					senderInv.put(cmdsender, cmdsender.getInventory().getContents());
@@ -159,37 +165,13 @@ public class SpectateCommandExecutor implements CommandExecutor {
 			return true;
 		}
 
-		if (cmd.getName().equalsIgnoreCase("spectateoff")) {
+		if (cmd.getName().equalsIgnoreCase("spectateoff") || cmd.getName().equalsIgnoreCase("specoff")) {
 
 			if (isSpectating.get(cmdsender) != null) {
 
 				if (isSpectating.get(cmdsender)) {
 
-					cmdsender.teleport(origLocation.get(cmdsender));
-					isSpectating.put(cmdsender, false);
-					isBeingSpectated.put(target.get(cmdsender), false);
-					cmdsender.getInventory().clear();
-					cmdsender.getInventory().setContents(senderInv.get(cmdsender));
-					cmdsender.getInventory().setArmorContents(senderArm.get(cmdsender));
-					cmdsender.setHealth(plugin.CommandExecutor.senderHealth.get(cmdsender));
-					cmdsender.setFoodLevel(plugin.CommandExecutor.senderHunger.get(cmdsender));
-					
-					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-						public void run() {
-
-							for (Player p : plugin.getServer().getOnlinePlayers()) {
-		
-								p.showPlayer(cmdsender);
-		
-							}
-							
-							target.get(cmdsender).showPlayer(cmdsender);
-							cmdsender.showPlayer(target.get(cmdsender));
-					
-						}
-						
-					}, 10L);
+					plugin.SpectateOff.spectateOff(cmdsender);
 
 					return true;
 

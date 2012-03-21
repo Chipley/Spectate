@@ -9,8 +9,9 @@ public class Spectate extends JavaPlugin {
 
 	FileConfiguration conf;
 
-	private final SpectateListener Listener = new SpectateListener(this);
-	final SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
+	public SpectateListener Listener = new SpectateListener(this);
+	public SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
+	public SpectateOff SpectateOff = new SpectateOff(this);
 
 	public void onDisable() {
 
@@ -22,20 +23,7 @@ public class Spectate extends JavaPlugin {
 
 					players.sendMessage("§7You were forced to stop spectating because of a server reload.");
 
-					players.teleport(CommandExecutor.origLocation.get(players));
-					CommandExecutor.isSpectating.put(players, false);
-					CommandExecutor.isBeingSpectated.put(CommandExecutor.target.get(players), false);
-					players.getInventory().clear();
-					players.getInventory().setContents(CommandExecutor.senderInv.get(players));
-					players.getInventory().setArmorContents(CommandExecutor.senderArm.get(players));
-					players.setHealth(CommandExecutor.senderHealth.get(players));
-					players.getPlayer().setFoodLevel(CommandExecutor.senderHunger.get(players));
-
-					for (Player playp : getServer().getOnlinePlayers()) {
-
-						players.showPlayer(playp);
-
-					}
+					SpectateOff.spectateOff(players);
 
 				}
 
@@ -53,7 +41,7 @@ public class Spectate extends JavaPlugin {
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 
-		System.out.println(pdfFile.getName() + " v" + pdfFile.getVersion() + " enabled!");
+		System.out.println("[" + pdfFile.getName() + "] " + " v" + pdfFile.getVersion() + " enabled!");
 
 		conf = getConfig();
 
@@ -63,8 +51,12 @@ public class Spectate extends JavaPlugin {
 			saveConfig();
 
 		}
+		
+		Listener.updatePitchAndYaw();
 
 		getCommand("spectate").setExecutor(CommandExecutor);
 		getCommand("spectateoff").setExecutor(CommandExecutor);
+		getCommand("spec").setExecutor(CommandExecutor);
+		getCommand("specoff").setExecutor(CommandExecutor);
 	}
 }

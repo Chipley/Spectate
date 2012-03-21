@@ -1,5 +1,8 @@
 package com.Chipmunk9998.Spectate;
 
+import java.text.DecimalFormat;
+
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -7,8 +10,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -17,13 +22,64 @@ public class SpectateListener implements Listener {
 
 	public Spectate plugin;
 
-	int varx;
-	int vayr;
-	int varz;
-
 	public SpectateListener(Spectate plugin) {
 
 		this.plugin = plugin;
+
+	}
+
+	public void updatePitchAndYaw() {
+
+		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+
+			public void run() {
+
+				for (Player p : plugin.getServer().getOnlinePlayers()) {
+
+					if (plugin.CommandExecutor.isSpectating.get(p) != null) {
+
+						if (plugin.CommandExecutor.isSpectating.get(p)) {
+
+							if (roundTwoDecimals(p.getLocation().getX()) != roundTwoDecimals(plugin.CommandExecutor.target.get(p).getLocation().getX()) || roundTwoDecimals(p.getLocation().getY()) != roundTwoDecimals(plugin.CommandExecutor.target.get(p).getLocation().getY()) || roundTwoDecimals(p.getLocation().getZ()) != roundTwoDecimals(plugin.CommandExecutor.target.get(p).getLocation().getZ()) || roundTwoDecimals(p.getLocation().getYaw()) != roundTwoDecimals(plugin.CommandExecutor.target.get(p).getLocation().getYaw()) || roundTwoDecimals(p.getLocation().getPitch()) != roundTwoDecimals(plugin.CommandExecutor.target.get(p).getLocation().getPitch())) {
+
+								Location loc = new Location(p.getLocation().getWorld(), plugin.CommandExecutor.target.get(p).getLocation().getX(), plugin.CommandExecutor.target.get(p).getLocation().getY(), plugin.CommandExecutor.target.get(p).getLocation().getZ());
+
+								loc.setYaw(plugin.CommandExecutor.target.get(p).getLocation().getYaw());
+
+								loc.setPitch(plugin.CommandExecutor.target.get(p).getLocation().getPitch());
+
+								p.teleport(loc);
+
+							}
+							
+							if (p.getInventory() != plugin.CommandExecutor.target.get(p).getInventory()) {
+
+								p.getInventory().setContents(plugin.CommandExecutor.target.get(p).getInventory().getContents());
+								p.getInventory().setArmorContents(plugin.CommandExecutor.target.get(p).getInventory().getArmorContents());
+
+							}
+
+							if (plugin.CommandExecutor.target.get(p).getHealth() > 0) {
+
+								p.setHealth(plugin.CommandExecutor.target.get(p).getHealth());
+
+							}else {
+
+								p.setHealth(1);
+
+							}
+
+							p.setFoodLevel(plugin.CommandExecutor.target.get(p).getFoodLevel());
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}, 0L, 1L);
 
 	}
 
@@ -34,30 +90,24 @@ public class SpectateListener implements Listener {
 
 			if (plugin.CommandExecutor.isBeingSpectated.get(event.getPlayer())) {
 
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).getPlayer().teleport(plugin.CommandExecutor.target.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
+				String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer()).split(",");
 
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).getInventory().clear();
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).getInventory().setContents(event.getPlayer().getInventory().getContents());
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).getInventory().setArmorContents(event.getPlayer().getInventory().getArmorContents());
+				for (String player : spectators) {
 
-				if (event.getPlayer().getHealth() > 0) {
+					Player p = plugin.getServer().getPlayer(player);
 
-					plugin.CommandExecutor.spectator.get(event.getPlayer()).setHealth(event.getPlayer().getHealth());
+					p.teleport(event.getPlayer());
 
-				}else {
+					for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
 
-					plugin.CommandExecutor.spectator.get(event.getPlayer()).setHealth(1);
+						onlinePlayers.hidePlayer(p);
 
-				}
+					}
 
-				for (Player p : plugin.getServer().getOnlinePlayers()) {
-
-					p.hidePlayer(plugin.CommandExecutor.spectator.get(event.getPlayer()));
+					p.hidePlayer(event.getPlayer());
+					event.getPlayer().hidePlayer(p);
 
 				}
-
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).hidePlayer(event.getPlayer());
-				event.getPlayer().hidePlayer(plugin.CommandExecutor.spectator.get(event.getPlayer()));
 
 			}
 
@@ -69,20 +119,12 @@ public class SpectateListener implements Listener {
 
 				event.getPlayer().teleport(plugin.CommandExecutor.target.get(event.getPlayer()));
 
-				for (Player p : plugin.getServer().getOnlinePlayers()) {
-
-					p.hidePlayer(event.getPlayer());
-
-				}
-
-				event.getPlayer().hidePlayer(plugin.CommandExecutor.target.get(event.getPlayer()));
-				plugin.CommandExecutor.target.get(event.getPlayer()).hidePlayer(event.getPlayer());
-
 			}
 
 		}
 
 	}
+
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
@@ -91,16 +133,15 @@ public class SpectateListener implements Listener {
 
 			if (plugin.CommandExecutor.isSpectating.get(event.getPlayer())) {
 
-				event.getPlayer().setFoodLevel(plugin.CommandExecutor.target.get(event.getPlayer()).getFoodLevel());
+				String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer()).split(",");
 
-				event.getPlayer().teleport(plugin.CommandExecutor.origLocation.get(event.getPlayer()));
-				plugin.CommandExecutor.isSpectating.put(event.getPlayer(), false);
-				event.getPlayer().getInventory().clear();
-				event.getPlayer().getInventory().setContents(plugin.CommandExecutor.senderInv.get(event.getPlayer()));
-				event.getPlayer().getInventory().setArmorContents(plugin.CommandExecutor.senderArm.get(event.getPlayer()));
-				event.getPlayer().setHealth(plugin.CommandExecutor.senderHealth.get(event.getPlayer()));
-				event.getPlayer().setFoodLevel(plugin.CommandExecutor.senderHunger.get(event.getPlayer()));
+				for (String player : spectators) {
 
+					Player p = plugin.getServer().getPlayer(player);
+
+					plugin.SpectateOff.spectateOff(p);
+
+				}
 			}
 		}
 
@@ -108,16 +149,19 @@ public class SpectateListener implements Listener {
 
 			if (plugin.CommandExecutor.isBeingSpectated.get(event.getPlayer())) {
 
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).sendMessage("§7You were forced to stop spectating because the person who you were spectating disconnected.");
+				String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer()).split(",");
 
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).teleport(plugin.CommandExecutor.origLocation.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
-				plugin.CommandExecutor.isSpectating.put(plugin.CommandExecutor.spectator.get(event.getPlayer()), false);
-				plugin.CommandExecutor.isBeingSpectated.put(event.getPlayer(), false);
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).getInventory().clear();
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).getInventory().setContents(plugin.CommandExecutor.senderInv.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).getInventory().setArmorContents(plugin.CommandExecutor.senderArm.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).setHealth(plugin.CommandExecutor.senderHealth.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
-				plugin.CommandExecutor.spectator.get(event.getPlayer()).setFoodLevel(plugin.CommandExecutor.senderHunger.get(plugin.CommandExecutor.spectator.get(event.getPlayer())));
+				for (String player : spectators) {
+
+					Player p = plugin.getServer().getPlayer(player);
+					
+					System.out.println(player);
+
+					p.sendMessage("§7You were forced to stop spectating because the person who you were spectating disconnected.");
+
+					plugin.SpectateOff.spectateOff(p);
+
+				}
 
 			}
 
@@ -188,7 +232,7 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onEnitityDamage(EntityDamageEvent event) {
 
-		if (event instanceof Player) {
+		if (event.getEntity() instanceof Player) {
 
 			Player pla = (Player)event.getEntity();
 
@@ -214,20 +258,15 @@ public class SpectateListener implements Listener {
 
 				if (plugin.CommandExecutor.isBeingSpectated.get(pla)) {
 
-					plugin.CommandExecutor.spectator.get(pla).sendMessage("§7You were forced to stop spectating because the person who you were spectating died.");
+					String[] spectators = plugin.CommandExecutor.spectator.get(pla).split(",");
 
-					plugin.CommandExecutor.spectator.get(pla).teleport(plugin.CommandExecutor.origLocation.get(plugin.CommandExecutor.spectator.get(pla)));
-					plugin.CommandExecutor.isSpectating.put(plugin.CommandExecutor.spectator.get(pla), false);
-					plugin.CommandExecutor.isBeingSpectated.put(pla, false);
-					plugin.CommandExecutor.spectator.get(pla).getInventory().clear();
-					plugin.CommandExecutor.spectator.get(pla).getInventory().setContents(plugin.CommandExecutor.senderInv.get(plugin.CommandExecutor.spectator.get(pla)));
-					plugin.CommandExecutor.spectator.get(pla).getInventory().setArmorContents(plugin.CommandExecutor.senderArm.get(plugin.CommandExecutor.spectator.get(pla)));
-					plugin.CommandExecutor.spectator.get(pla).setHealth(plugin.CommandExecutor.senderHealth.get(plugin.CommandExecutor.spectator.get(pla)));
-					plugin.CommandExecutor.spectator.get(pla).setFoodLevel(plugin.CommandExecutor.senderHunger.get(plugin.CommandExecutor.spectator.get(pla)));
+					for (String player : spectators) {
 
-					for (Player playp : plugin.getServer().getOnlinePlayers()) {
+						Player p = plugin.getServer().getPlayer(player);
 
-						plugin.CommandExecutor.spectator.get(pla).showPlayer(playp);
+						p.sendMessage("§7You were forced to stop spectating because the person who you were spectating died.");
+
+						plugin.SpectateOff.spectateOff(p);
 
 					}
 
@@ -236,6 +275,45 @@ public class SpectateListener implements Listener {
 			}
 
 		}
+
+	}
+
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent event) {
+
+		if (plugin.CommandExecutor.isSpectating.get(event.getPlayer()) != null) {
+
+			if (plugin.CommandExecutor.isSpectating.get(event.getPlayer())) {
+
+				event.setCancelled(true);
+
+			}
+
+		}
+
+	}
+
+	@EventHandler
+	public void onPlayerRegen(EntityRegainHealthEvent event) {
+
+		Player p = (Player) event.getEntity();
+
+		if (plugin.CommandExecutor.isSpectating.get(p) != null) {
+
+			if (plugin.CommandExecutor.isSpectating.get(p)) {
+
+				event.setCancelled(true);
+
+			}
+
+		}
+
+	}
+
+	double roundTwoDecimals(double d) {
+
+		DecimalFormat twoDForm = new DecimalFormat("#.##");
+		return Double.valueOf(twoDForm.format(d));
 
 	}
 
