@@ -45,17 +45,11 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 		final Player cmdsender = (Player) sender;
 
-		if (plugin.conf.getBoolean("Enable Permissions?")) {
+		if (!cmdsender.hasPermission("spectate.use")) {
 
-			if (!cmdsender.isOp()) {
+			cmdsender.sendMessage("§cYou do not have permission to spectate.");
+			return true;
 
-				if (!cmdsender.hasPermission("spectate.use")) {
-
-					cmdsender.sendMessage("§cYou do not have permission to spectate.");
-					return true;
-
-				}
-			}
 		}
 
 		if (cmd.getName().equalsIgnoreCase("spectate") || cmd.getName().equalsIgnoreCase("spec")) {
@@ -99,13 +93,17 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 					
-					if (targetPlayer.hasPermission("spectate.cantspectate")) {
+					if (plugin.conf.getBoolean("canspectate Permission Enabled?") == true) {
 
-						cmdsender.sendMessage("§7They can not be spectated.");
-						return true;
-
-					}
+						if (targetPlayer.hasPermission("spectate.cantspectate")) {
+	
+							cmdsender.sendMessage("§7They can not be spectated.");
+							return true;
+	
+						}
 					
+					}
+
 					if (isSpectating.get(cmdsender) != null) {
 
 						if (isSpectating.get(cmdsender)) {
@@ -117,22 +115,22 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					}
 
 
-					cmdsender.sendMessage("§7You are now spectating " + targetPlayer.getName());
+					cmdsender.sendMessage("§7You are now spectating " + targetPlayer.getName() + ".");
 					origLocation.put(cmdsender, cmdsender.getLocation());
 					isSpectating.put(cmdsender, true);
 					isBeingSpectated.put(targetPlayer, true);
-					
+
 					if (spectator.get(targetPlayer) == null) {
-					
+
 						spectator.put(targetPlayer, cmdsender.getName());
-					
+
 					}else {
-						
-						spectator.put(targetPlayer, spectator.get(cmdsender) + "," + cmdsender.getName());
-						
+
+						spectator.put(targetPlayer, spectator.get(targetPlayer) + "," + cmdsender.getName());
+
 					}
-					
-					
+
+
 					target.put(cmdsender, targetPlayer);
 					cmdsender.getPlayer().teleport(target.get(cmdsender));
 					senderInv.put(cmdsender, cmdsender.getInventory().getContents());
@@ -142,7 +140,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					cmdsender.getInventory().clear();
 					cmdsender.getInventory().setContents(targetPlayer.getInventory().getContents());
 					cmdsender.getInventory().setArmorContents(targetPlayer.getInventory().getArmorContents());
-					
+
 					for (Player player : plugin.getServer().getOnlinePlayers()) {
 
 						player.hidePlayer(cmdsender);

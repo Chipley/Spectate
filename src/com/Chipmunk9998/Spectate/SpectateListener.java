@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -28,7 +29,7 @@ public class SpectateListener implements Listener {
 
 	}
 
-	public void updatePitchAndYaw() {
+	public void updatePlayer() {
 
 		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -51,7 +52,7 @@ public class SpectateListener implements Listener {
 								p.teleport(loc);
 
 							}
-							
+
 							if (p.getInventory() != plugin.CommandExecutor.target.get(p).getInventory()) {
 
 								p.getInventory().setContents(plugin.CommandExecutor.target.get(p).getInventory().getContents());
@@ -133,15 +134,8 @@ public class SpectateListener implements Listener {
 
 			if (plugin.CommandExecutor.isSpectating.get(event.getPlayer())) {
 
-				String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer()).split(",");
+				plugin.SpectateOff.spectateOff(event.getPlayer());
 
-				for (String player : spectators) {
-
-					Player p = plugin.getServer().getPlayer(player);
-
-					plugin.SpectateOff.spectateOff(p);
-
-				}
 			}
 		}
 
@@ -154,10 +148,8 @@ public class SpectateListener implements Listener {
 				for (String player : spectators) {
 
 					Player p = plugin.getServer().getPlayer(player);
-					
-					System.out.println(player);
 
-					p.sendMessage("§7You were forced to stop spectating because the person who you were spectating disconnected.");
+					p.sendMessage("§7You were forced to stop spectating because the person you were spectating disconnected.");
 
 					plugin.SpectateOff.spectateOff(p);
 
@@ -234,14 +226,35 @@ public class SpectateListener implements Listener {
 
 		if (event.getEntity() instanceof Player) {
 
-			Player pla = (Player)event.getEntity();
+			Player target = (Player)event.getEntity();
 
-			if (plugin.CommandExecutor.isSpectating.get(pla) != null) {
+			if (plugin.CommandExecutor.isSpectating.get(target) != null) {
 
-				if (plugin.CommandExecutor.isSpectating.get(pla)) {
+				if (plugin.CommandExecutor.isSpectating.get(target)) {
 
 					event.setCancelled(true);
 
+				}
+
+			}
+
+		}
+
+		if (event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+
+			EntityDamageByEntityEvent event1 = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
+
+			if (event1.getDamager() instanceof Player) {
+
+				Player damager = (Player)event1.getDamager();
+
+				if (plugin.CommandExecutor.isSpectating.get(damager) != null) {
+
+					if (plugin.CommandExecutor.isSpectating.get(damager)) {
+
+						event.setCancelled(true);
+
+					}
 				}
 			}
 		}
@@ -264,7 +277,7 @@ public class SpectateListener implements Listener {
 
 						Player p = plugin.getServer().getPlayer(player);
 
-						p.sendMessage("§7You were forced to stop spectating because the person who you were spectating died.");
+						p.sendMessage("§7You were forced to stop spectating because the person you were spectating died.");
 
 						plugin.SpectateOff.spectateOff(p);
 

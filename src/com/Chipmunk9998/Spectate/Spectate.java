@@ -38,25 +38,27 @@ public class Spectate extends JavaPlugin {
 	public void onEnable() {
 
 		getServer().getPluginManager().registerEvents(Listener, this);
+		
+		conf = getConfig();
+		
+		if (conf.get("canspectate Permission Enabled?") == null) {
+			
+			conf.set("canspectate Permission Enabled?", false);
+			
+		}
+		
+		saveConfig();
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 
-		System.out.println("[" + pdfFile.getName() + "] " + " v" + pdfFile.getVersion() + " enabled!");
-
-		conf = getConfig();
-
-		if (conf.get("Enable Permissions?") == null) {
-
-			conf.set("Enable Permissions?", true);
-			saveConfig();
-
-		}
+		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " enabled!");
 		
-		Listener.updatePitchAndYaw();
+		Listener.updatePlayer();
 
 		getCommand("spectate").setExecutor(CommandExecutor);
 		getCommand("spectateoff").setExecutor(CommandExecutor);
 		getCommand("spec").setExecutor(CommandExecutor);
 		getCommand("specoff").setExecutor(CommandExecutor);
 	}
+	
 }

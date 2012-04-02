@@ -16,7 +16,6 @@ public class SpectateOff {
 		
 		player.teleport(plugin.CommandExecutor.origLocation.get(player));
 		plugin.CommandExecutor.isSpectating.put(player, false);
-		plugin.CommandExecutor.isBeingSpectated.put(plugin.CommandExecutor.target.get(player), false);
 		player.getInventory().clear();
 		player.getInventory().setContents(plugin.CommandExecutor.senderInv.get(player));
 		player.getInventory().setArmorContents(plugin.CommandExecutor.senderArm.get(player));
@@ -31,7 +30,7 @@ public class SpectateOff {
 			
 			for (String players : spectators) {
 				
-				if (players != player.getName()) {
+				if (!players.equals(player.getName())) {
 					
 					if (plugin.CommandExecutor.spectator.get(plugin.CommandExecutor.target.get(player)) == null) {
 						
@@ -46,6 +45,10 @@ public class SpectateOff {
 				}
 				
 			}
+			
+		}else {
+			
+			plugin.CommandExecutor.isBeingSpectated.put(plugin.CommandExecutor.target.get(player), false);
 			
 		}
 		
