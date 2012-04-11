@@ -70,9 +70,24 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					if (cmdsender.getName() == targetPlayer.getName()) {
 
-						cmdsender.sendMessage("§7You're already spectating yourself...");
+						cmdsender.sendMessage("§7Did you really just try to spectate yourself?");
 						return true;
 
+					}
+					
+					if (isSpectating.get(cmdsender) != null) {
+						
+						if (isSpectating.get(cmdsender)) {
+					
+							if (targetPlayer.getName() == target.get(cmdsender).getName()) {
+		
+								cmdsender.sendMessage("§7You are already spectating them.");
+								return true;
+		
+							}
+						
+						}
+					
 					}
 
 					if (isSpectating.get(targetPlayer) != null) {

@@ -309,13 +309,17 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerRegen(EntityRegainHealthEvent event) {
 
-		Player p = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player) {
 
-		if (plugin.CommandExecutor.isSpectating.get(p) != null) {
+			Player p = (Player) event.getEntity();
 
-			if (plugin.CommandExecutor.isSpectating.get(p)) {
+			if (plugin.CommandExecutor.isSpectating.get(p) != null) {
 
-				event.setCancelled(true);
+				if (plugin.CommandExecutor.isSpectating.get(p)) {
+
+					event.setCancelled(true);
+
+				}
 
 			}
 
