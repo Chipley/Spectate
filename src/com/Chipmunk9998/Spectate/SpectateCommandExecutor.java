@@ -1,8 +1,7 @@
 package com.Chipmunk9998.Spectate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -15,15 +14,19 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 	public Spectate plugin;
 
-	public Map<Player, Boolean> isSpectating = new HashMap<Player, Boolean>();
-	public Map<Player, Boolean> isBeingSpectated = new HashMap<Player, Boolean>();
-	public Map<Player, String> spectator = new HashMap<Player, String>();
-	public Map<Player, Player> target = new HashMap<Player, Player>();
-	public Map<Player, ItemStack[]> senderInv = new HashMap<Player, ItemStack[]>();
-	public Map<Player, ItemStack[]> senderArm = new HashMap<Player, ItemStack[]>();
-	public Map<Player, Integer> senderHunger = new HashMap<Player, Integer>();
-	public Map<Player, Integer> senderHealth = new HashMap<Player, Integer>();
+	public HashMap<Player, Boolean> isSpectating = new HashMap<Player, Boolean>();
+	public HashMap<Player, Boolean> isBeingSpectated = new HashMap<Player, Boolean>();
+	public HashMap<Player, String> spectator = new HashMap<Player, String>();
+	public HashMap<Player, Player> target = new HashMap<Player, Player>();
+	public HashMap<Player, ItemStack[]> senderInv = new HashMap<Player, ItemStack[]>();
+	public HashMap<Player, ItemStack[]> senderArm = new HashMap<Player, ItemStack[]>();
+	public HashMap<Player, Integer> senderHunger = new HashMap<Player, Integer>();
+	public HashMap<Player, Integer> senderHealth = new HashMap<Player, Integer>();
 	public HashMap<Player, Location> origLocation = new HashMap<Player, Location>();
+	public HashMap<Player, String> mode = new HashMap<Player, String>();
+	public HashMap<Player, Integer> playerNumber = new HashMap<Player, Integer>();
+
+	public HashMap<Player, Boolean> isClick = new HashMap<Player, Boolean>();
 
 	String cmdtarget;
 	Player targetPlayer;
@@ -59,7 +62,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 				cmdtarget = args[0];
 				targetPlayer = Bukkit.getPlayer(cmdtarget);
 
-				if (args[0].equalsIgnoreCase("herobrine")) {
+				if (args[0].equalsIgnoreCase("herobrine") && targetPlayer == null) {
 
 					cmdsender.sendMessage("§7You can't watch Herobrine, only he can watch you ;)");
 					return true;
@@ -74,20 +77,20 @@ public class SpectateCommandExecutor implements CommandExecutor {
 						return true;
 
 					}
-					
+
 					if (isSpectating.get(cmdsender) != null) {
-						
+
 						if (isSpectating.get(cmdsender)) {
-					
+
 							if (targetPlayer.getName() == target.get(cmdsender).getName()) {
-		
+
 								cmdsender.sendMessage("§7You are already spectating them.");
 								return true;
-		
+
 							}
-						
+
 						}
-					
+
 					}
 
 					if (isSpectating.get(targetPlayer) != null) {
@@ -107,64 +110,66 @@ public class SpectateCommandExecutor implements CommandExecutor {
 						return true;
 
 					}
-					
+
 					if (plugin.conf.getBoolean("canspectate Permission Enabled?") == true) {
 
 						if (targetPlayer.hasPermission("spectate.cantspectate")) {
-	
+
 							cmdsender.sendMessage("§7They can not be spectated.");
 							return true;
-	
+
 						}
+
+					}
+
+					ArrayList<Player> spectateablePlayers = new ArrayList<Player>();
+
+					for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
+
+						if (!onlinePlayers.isDead() && onlinePlayers != cmdsender) {
+
+							if (plugin.CommandExecutor.isSpectating.get(onlinePlayers) != null) {
+
+								if (plugin.CommandExecutor.isSpectating.get(onlinePlayers)) {
+
+									continue;
+
+								}
+
+							}
+
+							if (plugin.conf.getBoolean("canspectate Permission Enabled?") == true) {
+
+								if (!onlinePlayers.hasPermission("spectate.cantspectate")) {
+
+									continue;
+
+								}
+
+							}
+
+							spectateablePlayers.add(onlinePlayers);
+
+						}
+
+					}
+
+					int tempPlayerNumber = 0;
+
+					for (Player p : spectateablePlayers) {
+
+						if (plugin.CommandExecutor.target.get(cmdsender) == p) {
+
+							break;
+
+						}
+
+						tempPlayerNumber++;
+
+					}
 					
-					}
-
-					if (isSpectating.get(cmdsender) != null) {
-
-						if (isSpectating.get(cmdsender)) {
-
-							plugin.SpectateOff.spectateOff(cmdsender);
-
-						}
-
-					}
-
-
-					cmdsender.sendMessage("§7You are now spectating " + targetPlayer.getName() + ".");
-					origLocation.put(cmdsender, cmdsender.getLocation());
-					isSpectating.put(cmdsender, true);
-					isBeingSpectated.put(targetPlayer, true);
-
-					if (spectator.get(targetPlayer) == null) {
-
-						spectator.put(targetPlayer, cmdsender.getName());
-
-					}else {
-
-						spectator.put(targetPlayer, spectator.get(targetPlayer) + "," + cmdsender.getName());
-
-					}
-
-
-					target.put(cmdsender, targetPlayer);
-					cmdsender.getPlayer().teleport(target.get(cmdsender));
-					senderInv.put(cmdsender, cmdsender.getInventory().getContents());
-					senderArm.put(cmdsender, cmdsender.getInventory().getArmorContents());
-					senderHunger.put(cmdsender, cmdsender.getFoodLevel());
-					senderHealth.put(cmdsender, cmdsender.getHealth());
-					cmdsender.getInventory().clear();
-					cmdsender.getInventory().setContents(targetPlayer.getInventory().getContents());
-					cmdsender.getInventory().setArmorContents(targetPlayer.getInventory().getArmorContents());
-
-					for (Player player : plugin.getServer().getOnlinePlayers()) {
-
-						player.hidePlayer(cmdsender);
-
-					}
-
-					targetPlayer.hidePlayer(cmdsender);
-					cmdsender.hidePlayer(targetPlayer);
-
+					plugin.CommandExecutor.playerNumber.put(cmdsender, tempPlayerNumber);
+					plugin.SpectateExtras.spectateOn(cmdsender, targetPlayer);
 					return true;
 
 				}
@@ -172,10 +177,74 @@ public class SpectateCommandExecutor implements CommandExecutor {
 				cmdsender.sendMessage("§cError: Player is not online§f");
 				return true;
 
+			}else if (plugin.CommandExecutor.mode.get(cmdsender) != null) {
+
+				if (plugin.CommandExecutor.mode.get(cmdsender).equals("2")) {
+
+					ArrayList<Player> spectateablePlayers = new ArrayList<Player>();
+
+					for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
+
+						if (!onlinePlayers.isDead() && onlinePlayers != cmdsender) {
+
+							if (plugin.CommandExecutor.isSpectating.get(onlinePlayers) != null) {
+
+								if (plugin.CommandExecutor.isSpectating.get(onlinePlayers)) {
+
+									continue;
+
+								}
+
+							}
+
+							if (plugin.conf.getBoolean("canspectate Permission Enabled?") == true) {
+
+								if (!onlinePlayers.hasPermission("spectate.cantspectate")) {
+
+									continue;
+
+								}
+
+							}
+
+							spectateablePlayers.add(onlinePlayers);
+
+						}
+
+					}
+
+					Player[] players = spectateablePlayers.toArray(new Player[spectateablePlayers.size()]);
+
+					if (isSpectating.get(cmdsender) != null) {
+
+						if (isSpectating.get(cmdsender)) {
+
+							if (target.get(cmdsender) != null) {
+
+								if (players[0] == target.get(cmdsender)) {
+
+									cmdsender.sendMessage("§cError: You are already spectating this player.");
+									return true;
+
+								}
+
+							}
+
+						}
+
+					}
+
+					plugin.SpectateExtras.spectateOn(cmdsender, players[0]);
+					playerNumber.put(cmdsender, 0);
+					return true;
+
+				}
+
 			}
 
 			cmdsender.sendMessage("§cError: No player target§f");
 			return true;
+
 		}
 
 		if (cmd.getName().equalsIgnoreCase("spectateoff") || cmd.getName().equalsIgnoreCase("specoff")) {
@@ -184,7 +253,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				if (isSpectating.get(cmdsender)) {
 
-					plugin.SpectateOff.spectateOff(cmdsender);
+					plugin.SpectateExtras.spectateOff(cmdsender);
 
 					return true;
 
@@ -196,6 +265,72 @@ public class SpectateCommandExecutor implements CommandExecutor {
 			return true;
 
 		}
+
+		if (cmd.getName().equalsIgnoreCase("spectatemode") || cmd.getName().equalsIgnoreCase("specmode")) {
+
+			if (args.length < 1) {
+
+				cmdsender.sendMessage("§cError: You must enter the mode type.");
+				return true;
+
+			}
+
+			if (args[0].equalsIgnoreCase("1") || args[0].equalsIgnoreCase("default")) {
+
+				if (mode.get(cmdsender) == null) {
+
+					cmdsender.sendMessage("§7You are already in this mode.");
+					return true;
+
+				}
+
+				if (mode.get(cmdsender).equals("1")) {
+
+					cmdsender.sendMessage("§7You are already in this mode.");
+					return true;
+
+				}
+
+				mode.put(cmdsender, "1");
+				cmdsender.sendMessage("§7You are now using the default spectate mode.");
+				return true;
+
+			}
+
+			if (args[0].equalsIgnoreCase("2") || args[0].equalsIgnoreCase("scroll")) {
+
+				if (mode.get(cmdsender) == null) {
+
+					mode.put(cmdsender, "2");
+					cmdsender.sendMessage("§7You are now using the scroll spectate mode.");
+					return true;
+
+				}
+
+				if (mode.get(cmdsender).equals("2")) {
+
+					cmdsender.sendMessage("§7You are already in this mode.");
+					return true;
+
+				}
+
+				mode.put(cmdsender, "2");
+				cmdsender.sendMessage("§7You are now using the scroll spectate mode.");
+				return true;
+
+			}
+
+		}
+
+		//		if (cmd.getName().equalsIgnoreCase("spectatescan") || cmd.getName().equalsIgnoreCase("specscan")) {
+		//			
+		//			if (args.length == 1) {
+		//				
+		//				plugin.SpectateExtras.spectateScan(Integer.parseInt(args[0]));
+		//				
+		//			}
+		//			
+		//		}
 
 		return true;
 	}

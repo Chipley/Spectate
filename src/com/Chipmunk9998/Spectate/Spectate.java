@@ -11,29 +11,7 @@ public class Spectate extends JavaPlugin {
 
 	public SpectateListener Listener = new SpectateListener(this);
 	public SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
-	public SpectateOff SpectateOff = new SpectateOff(this);
-
-	public void onDisable() {
-
-		for (Player players : getServer().getOnlinePlayers()) {
-
-			if (CommandExecutor.isSpectating.get(players) != null) {
-
-				if (CommandExecutor.isSpectating.get(players)) {
-
-					players.sendMessage("§7You were forced to stop spectating because of a server reload.");
-
-					SpectateOff.spectateOff(players);
-
-				}
-
-			}
-
-		}
-
-		System.out.println("Spectate is disabled!");
-
-	}
+	public SpectateExtras SpectateExtras = new SpectateExtras(this);
 
 	public void onEnable() {
 
@@ -51,7 +29,7 @@ public class Spectate extends JavaPlugin {
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 
-		System.out.println("[" + pdfFile.getName() + "]" + " v" + pdfFile.getVersion() + " enabled!");
+		System.out.println("[" + pdfFile.getName() + "] " + pdfFile.getName() + " v" + pdfFile.getVersion() + " enabled!");
 		
 		Listener.updatePlayer();
 
@@ -59,6 +37,31 @@ public class Spectate extends JavaPlugin {
 		getCommand("spectateoff").setExecutor(CommandExecutor);
 		getCommand("spec").setExecutor(CommandExecutor);
 		getCommand("specoff").setExecutor(CommandExecutor);
+		getCommand("spectatemode").setExecutor(CommandExecutor);
+		getCommand("specmode").setExecutor(CommandExecutor);
+		
+	}
+	
+	public void onDisable() {
+
+		for (Player players : getServer().getOnlinePlayers()) {
+
+			if (CommandExecutor.isSpectating.get(players) != null) {
+
+				if (CommandExecutor.isSpectating.get(players)) {
+
+					players.sendMessage("§7You were forced to stop spectating because of a server reload.");
+
+					SpectateExtras.spectateOff(players);
+
+				}
+
+			}
+
+		}
+
+		System.out.println("Spectate is disabled!");
+
 	}
 	
 }

@@ -1,6 +1,6 @@
 name: Spectate
 main: com.Chipmunk9998.Spectate.Spectate
-version: 1.7.1
+version: 1.8
 commands:
     spectate:
         description: Lets you spectate another user
@@ -10,3 +10,7 @@ commands:
         description: Lets you spectate another user
     specoff:
         description: Stops you from spectating and returns you back to your original location
+    spectatemode:
+        description: Lets you change your spectate mode.
+    specmode:
+        description: Lets you change your spectate mode.
