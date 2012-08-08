@@ -11,7 +11,7 @@ public class Spectate extends JavaPlugin {
 
 	public SpectateListener Listener = new SpectateListener(this);
 	public SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
-	public SpectateExtras SpectateExtras = new SpectateExtras(this);
+	public SpectateAPI SpectateExtras = new SpectateAPI(this);
 
 	public void onEnable() {
 
@@ -34,11 +34,7 @@ public class Spectate extends JavaPlugin {
 		Listener.updatePlayer();
 
 		getCommand("spectate").setExecutor(CommandExecutor);
-		getCommand("spectateoff").setExecutor(CommandExecutor);
 		getCommand("spec").setExecutor(CommandExecutor);
-		getCommand("specoff").setExecutor(CommandExecutor);
-		getCommand("spectatemode").setExecutor(CommandExecutor);
-		getCommand("specmode").setExecutor(CommandExecutor);
 		
 	}
 	
@@ -46,11 +42,23 @@ public class Spectate extends JavaPlugin {
 
 		for (Player players : getServer().getOnlinePlayers()) {
 
-			if (CommandExecutor.isSpectating.get(players) != null) {
+			if (CommandExecutor.isSpectating.get(players.getName()) != null) {
 
-				if (CommandExecutor.isSpectating.get(players)) {
+				if (CommandExecutor.isSpectating.get(players.getName())) {
 
 					players.sendMessage("§7You were forced to stop spectating because of a server reload.");
+					
+					if (CommandExecutor.isScrolling.get(players.getName()) != null) {
+
+						if (CommandExecutor.isScrolling.get(players.getName())) {
+
+							CommandExecutor.isScrolling.put(players.getName(), false);
+							
+							getServer().getScheduler().cancelTask(CommandExecutor.taskId.get(players.getName()));
+
+						}
+
+					}
 
 					SpectateExtras.spectateOff(players);
 
