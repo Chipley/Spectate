@@ -60,6 +60,39 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			if (args.length > 0) {
 				
+				if (args[0].equalsIgnoreCase("off")) {
+					
+					if (isSpectating.get(cmdsender.getName()) != null) {
+
+						if (isSpectating.get(cmdsender.getName())) {
+							
+							cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
+
+							plugin.SpectateAPI.spectateOff(cmdsender);
+							
+							if (plugin.CommandExecutor.isScrolling.get(cmdsender.getName()) != null) {
+
+								if (plugin.CommandExecutor.isScrolling.get(cmdsender.getName())) {
+
+									plugin.CommandExecutor.isScrolling.put(cmdsender.getName(), false);
+									
+									plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(cmdsender.getName()));
+
+								}
+
+							}
+							
+							return true;
+
+						}
+
+					}
+					
+					cmdsender.sendMessage("§7You are not currently spectating anyone.");
+					return true;
+					
+				}
+				
 				if (args[0].equalsIgnoreCase("mode")) {
 					
 					if (args.length < 2) {
