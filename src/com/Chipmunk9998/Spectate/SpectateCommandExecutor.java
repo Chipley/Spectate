@@ -151,7 +151,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 					
-					ArrayList<Player> spectateablePlayers = plugin.SpectateExtras.getSpectateablePlayers();
+					ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
 
 					spectateablePlayers.remove(cmdsender);
 
@@ -164,13 +164,13 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					plugin.SpectateExtras.spectateScan(interval, cmdsender);
+					plugin.SpectateAPI.spectateScan(interval, cmdsender);
 
 					if (isSpectating.get(cmdsender.getName()) != null) {
 
 						if (!isSpectating.get(cmdsender.getName())) {
 
-							plugin.SpectateExtras.spectateOn(cmdsender, specPlayers[1]);
+							plugin.SpectateAPI.spectateOn(cmdsender, specPlayers[1]);
 
 						}
 
@@ -297,7 +297,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 					
-					plugin.SpectateExtras.spectateOn(cmdsender, targetPlayer);
+					plugin.SpectateAPI.spectateOn(cmdsender, targetPlayer);
 					return true;
 
 				}
@@ -313,7 +313,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					
 					cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
 
-					plugin.SpectateExtras.spectateOff(cmdsender);
+					plugin.SpectateAPI.spectateOff(cmdsender);
 					
 					if (plugin.CommandExecutor.isScrolling.get(cmdsender.getName()) != null) {
 
@@ -390,7 +390,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					plugin.SpectateExtras.spectateOn(cmdsender, players[0]);
+					plugin.SpectateAPI.spectateOn(cmdsender, players[0]);
 					playerNumber.put(cmdsender.getName(), 0);
 					return true;
 

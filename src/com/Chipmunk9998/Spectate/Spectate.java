@@ -11,7 +11,7 @@ public class Spectate extends JavaPlugin {
 
 	public SpectateListener Listener = new SpectateListener(this);
 	public SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
-	public SpectateAPI SpectateExtras = new SpectateAPI(this);
+	public SpectateAPI SpectateAPI = new SpectateAPI(this);
 
 	public void onEnable() {
 
@@ -60,7 +60,7 @@ public class Spectate extends JavaPlugin {
 
 					}
 
-					SpectateExtras.spectateOff(players);
+					SpectateAPI.spectateOff(players);
 
 				}
 

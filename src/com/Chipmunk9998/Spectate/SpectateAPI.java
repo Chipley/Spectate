@@ -21,7 +21,7 @@ public class SpectateAPI {
 
 			if (plugin.CommandExecutor.isSpectating.get(player.getName())) {
 
-				plugin.SpectateExtras.spectateOff(player);
+				plugin.SpectateAPI.spectateOff(player);
 
 			}
 
@@ -63,7 +63,7 @@ public class SpectateAPI {
 
 		}
 		
-		ArrayList<Player> spectateablePlayers = plugin.SpectateExtras.getSpectateablePlayers();
+		ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
 		
 		spectateablePlayers.remove(player);
 
@@ -194,7 +194,7 @@ public class SpectateAPI {
 
 				}
 
-				plugin.SpectateExtras.spectateOn(player, players[players.length - 1]);
+				plugin.SpectateAPI.spectateOn(player, players[players.length - 1]);
 				plugin.Listener.clickEnable(player);
 				return;
 
@@ -206,7 +206,7 @@ public class SpectateAPI {
 
 			}
 
-			plugin.SpectateExtras.spectateOn(player, players[tempPlayerNumber - 1]);
+			plugin.SpectateAPI.spectateOn(player, players[tempPlayerNumber - 1]);
 			plugin.Listener.clickEnable(player);
 
 		}
@@ -248,7 +248,7 @@ public class SpectateAPI {
 
 				}
 
-				plugin.SpectateExtras.spectateOn(player, players[0]);
+				plugin.SpectateAPI.spectateOn(player, players[0]);
 				plugin.Listener.clickEnable(player);
 				return;
 
@@ -260,7 +260,7 @@ public class SpectateAPI {
 
 			}
 
-			plugin.SpectateExtras.spectateOn(player, players[tempPlayerNumber + 1]);
+			plugin.SpectateAPI.spectateOn(player, players[tempPlayerNumber + 1]);
 			plugin.Listener.clickEnable(player);
 
 		}
