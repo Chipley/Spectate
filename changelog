@@ -2,4 +2,4 @@
 - Fixed spectating players not being able to shoot projectiles and not being hit by projectiles.
 - Added a '/spectate inv' argument that toggles inventory on and off.
 - Added a spectate scan mode that switches through players at an interval. Type '/spectate scan (interval in seconds)' to enter the scan mode.
-- Made players not able to interact with doors, levers, buttons, etc... again. This was accidentally removed last update.
+- Made players not able to interact with doors, levers, buttons, etc... again. This was accidentally removed in the previous version.
