@@ -27,7 +27,7 @@ public class Spectate extends JavaPlugin {
 		
 		saveConfig();
 
-		PluginDescriptionFile pdfFile = this.getDescription();
+		PluginDescriptionFile pdfFile = getDescription();
 
 		System.out.println("[" + pdfFile.getName() + "] " + pdfFile.getName() + " v" + pdfFile.getVersion() + " enabled!");
 		
