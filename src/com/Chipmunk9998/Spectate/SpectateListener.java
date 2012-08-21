@@ -273,20 +273,14 @@ public class SpectateListener implements Listener {
 				if (plugin.CommandExecutor.isSpectating.get(target.getName())) {
 
 					if (event.getDamager() instanceof Projectile) {
-						
-						event.getDamager().remove();
 
 						EntityDamageByEntityEvent bowDamage = new EntityDamageByEntityEvent(event.getDamager(), plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())), event.getCause(), event.getDamage());
-
-						System.out.println(plugin.CommandExecutor.target.get(target.getName()));
-						
-						System.out.println(target.getName());
-						
-						System.out.println(event.getDamager() + ", " + plugin.CommandExecutor.target.get(target.getName()) + ", " + event.getCause() + ", " + event.getDamage());
 						
 						plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())).setLastDamageCause(bowDamage);
 
 						plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())).damage(event.getDamage());
+						
+						event.getDamager().remove();
 
 					}
 
