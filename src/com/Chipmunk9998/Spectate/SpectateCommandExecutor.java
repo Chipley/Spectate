@@ -334,6 +334,13 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					return true;
 
 				}
+				
+				if (args[0].equalsIgnoreCase("herobrine")) {
+
+					cmdsender.sendMessage("§7You can't watch Herobrine, only he can watch you ;)");
+					return true;
+
+				}
 
 				cmdsender.sendMessage("§cError: Player is not online§f");
 				return true;
