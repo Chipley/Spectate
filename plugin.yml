@@ -4,5 +4,4 @@ version: 1.9
 commands:
     spectate:
         description: Lets you spectate another user
-    spec:
-        description: Lets you spectate another user
+    aliases: [spec]
