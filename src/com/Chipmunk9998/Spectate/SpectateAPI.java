@@ -48,23 +48,19 @@ public class SpectateAPI {
 		plugin.CommandExecutor.senderHunger.put(player.getName(), player.getFoodLevel());
 		plugin.CommandExecutor.senderHealth.put(player.getName(), player.getHealth());
 
-		if (plugin.CommandExecutor.isInv.get(player.getName()) != null) {
+		if (plugin.CommandExecutor.isInv.get(player.getName()) != null || plugin.CommandExecutor.isInv.get(player.getName())) {
 
-			if (plugin.CommandExecutor.isInv.get(player.getName())) {
+			plugin.CommandExecutor.senderInv.put(player.getName(), player.getInventory().getContents());
+			plugin.CommandExecutor.senderArm.put(player.getName(), player.getInventory().getArmorContents());
 
-				plugin.CommandExecutor.senderInv.put(player.getName(), player.getInventory().getContents());
-				plugin.CommandExecutor.senderArm.put(player.getName(), player.getInventory().getArmorContents());
-
-				player.getInventory().clear();
-				player.getInventory().setContents(target.getInventory().getContents());
-				player.getInventory().setArmorContents(target.getInventory().getArmorContents());
-
-			}
+			player.getInventory().clear();
+			player.getInventory().setContents(target.getInventory().getContents());
+			player.getInventory().setArmorContents(target.getInventory().getArmorContents());
 
 		}
-		
+
 		ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
-		
+
 		spectateablePlayers.remove(player);
 
 		int tempPlayerNumber = 0;
@@ -99,15 +95,11 @@ public class SpectateAPI {
 
 		plugin.CommandExecutor.isSpectating.put(player.getName(), false);
 
-		if (plugin.CommandExecutor.isInv.get(player.getName()) != null) {
+		if (plugin.CommandExecutor.isInv.get(player.getName()) != null || plugin.CommandExecutor.isInv.get(player.getName())) {
 
-			if (plugin.CommandExecutor.isInv.get(player.getName())) {
-
-				player.getInventory().clear();
-				player.getInventory().setContents(plugin.CommandExecutor.senderInv.get(player.getName()));
-				player.getInventory().setArmorContents(plugin.CommandExecutor.senderArm.get(player.getName()));
-
-			}
+			player.getInventory().clear();
+			player.getInventory().setContents(plugin.CommandExecutor.senderInv.get(player.getName()));
+			player.getInventory().setArmorContents(plugin.CommandExecutor.senderArm.get(player.getName()));
 
 		}
 

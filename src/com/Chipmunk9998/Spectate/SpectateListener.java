@@ -65,14 +65,10 @@ public class SpectateListener implements Listener {
 
 							}
 
-							if (plugin.CommandExecutor.isInv.get(p.getName()) != null) {
+							if (plugin.CommandExecutor.isInv.get(p.getName()) != null || plugin.CommandExecutor.isInv.get(p.getName())) {
 
-								if (plugin.CommandExecutor.isInv.get(p.getName())) {
-
-									p.getInventory().setContents(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getContents());
-									p.getInventory().setArmorContents(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getArmorContents());
-
-								}
+								p.getInventory().setContents(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getContents());
+								p.getInventory().setArmorContents(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getArmorContents());
 
 							}
 
@@ -156,7 +152,7 @@ public class SpectateListener implements Listener {
 
 					Player p = plugin.getServer().getPlayer(player);
 
-					if ((plugin.CommandExecutor.mode.get(p.getName()) != null || plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScrolling.get(p.getName()) != null || plugin.CommandExecutor.isScrolling.get(p.getName()))) {	
+					if ((plugin.CommandExecutor.mode.get(p.getName()) != null || plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null || plugin.CommandExecutor.isScanning.get(p.getName()))) {	
 
 						ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
 
@@ -275,11 +271,11 @@ public class SpectateListener implements Listener {
 					if (event.getDamager() instanceof Projectile) {
 
 						EntityDamageByEntityEvent bowDamage = new EntityDamageByEntityEvent(event.getDamager(), plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())), event.getCause(), event.getDamage());
-						
+
 						plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())).setLastDamageCause(bowDamage);
 
 						plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())).damage(event.getDamage());
-						
+
 						event.getDamager().remove();
 
 					}
@@ -351,7 +347,7 @@ public class SpectateListener implements Listener {
 		if (event instanceof PlayerDeathEvent) {
 
 			Player pla = (Player)event.getEntity();
-			
+
 			if (plugin.CommandExecutor.isBeingSpectated.get(pla.getName()) != null) {
 
 				if (plugin.CommandExecutor.isBeingSpectated.get(pla.getName())) {
@@ -362,10 +358,10 @@ public class SpectateListener implements Listener {
 
 						Player p = plugin.getServer().getPlayer(player);
 
-						if ((plugin.CommandExecutor.mode.get(p.getName()) != null && plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScrolling.get(p.getName()) != null && plugin.CommandExecutor.isScrolling.get(p.getName()))) {
+						if ((plugin.CommandExecutor.mode.get(p.getName()) != null && plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null && plugin.CommandExecutor.isScanning.get(p.getName()))) {
 
 							ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
-							
+
 							spectateablePlayers.remove(p);
 
 							Player[] players = spectateablePlayers.toArray(new Player[spectateablePlayers.size()]);
@@ -381,7 +377,7 @@ public class SpectateListener implements Listener {
 									plugin.SpectateAPI.spectateOn(p, players[plugin.CommandExecutor.playerNumber.get(p.getName())]);
 
 								}
-								
+
 								p.sendMessage("§7The person you were previously spectating has died.");
 
 							}catch (ArrayIndexOutOfBoundsException e) {

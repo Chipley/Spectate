@@ -48,11 +48,11 @@ public class Spectate extends JavaPlugin {
 
 					players.sendMessage("§7You were forced to stop spectating because of a server reload.");
 					
-					if (CommandExecutor.isScrolling.get(players.getName()) != null) {
+					if (CommandExecutor.isScanning.get(players.getName()) != null) {
 
-						if (CommandExecutor.isScrolling.get(players.getName())) {
+						if (CommandExecutor.isScanning.get(players.getName())) {
 
-							CommandExecutor.isScrolling.put(players.getName(), false);
+							CommandExecutor.isScanning.put(players.getName(), false);
 							
 							getServer().getScheduler().cancelTask(CommandExecutor.taskId.get(players.getName()));
 

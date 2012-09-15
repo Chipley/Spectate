@@ -26,7 +26,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 	public HashMap<String, String> mode = new HashMap<String, String>();
 	public HashMap<String, Integer> playerNumber = new HashMap<String, Integer>();
 
-	public HashMap<String, Boolean> isScrolling = new HashMap<String, Boolean>();
+	public HashMap<String, Boolean> isScanning = new HashMap<String, Boolean>();
 	public HashMap<String, Boolean> isInv = new HashMap<String, Boolean>();
 	
 	public HashMap<String, Integer> taskId = new HashMap<String, Integer>();
@@ -70,11 +70,11 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 							plugin.SpectateAPI.spectateOff(cmdsender);
 							
-							if (plugin.CommandExecutor.isScrolling.get(cmdsender.getName()) != null) {
+							if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
 
-								if (plugin.CommandExecutor.isScrolling.get(cmdsender.getName())) {
+								if (plugin.CommandExecutor.isScanning.get(cmdsender.getName())) {
 
-									plugin.CommandExecutor.isScrolling.put(cmdsender.getName(), false);
+									plugin.CommandExecutor.isScanning.put(cmdsender.getName(), false);
 									
 									plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(cmdsender.getName()));
 
@@ -146,11 +146,11 @@ public class SpectateCommandExecutor implements CommandExecutor {
 				
 				if (args[0].equalsIgnoreCase("scan")) {
 					
-					if (isScrolling.get(cmdsender.getName()) != null) {
+					if (isScanning.get(cmdsender.getName()) != null) {
 
-						if (isScrolling.get(cmdsender.getName())) {
+						if (isScanning.get(cmdsender.getName())) {
 
-							cmdsender.sendMessage("§cError: You are already scrolling.");
+							cmdsender.sendMessage("§cError: You are already scanning.");
 							return true;
 
 						}
@@ -209,7 +209,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					isScrolling.put(cmdsender.getName(), true);
+					isScanning.put(cmdsender.getName(), true);
 					return true;
 					
 				}
@@ -247,8 +247,8 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 						if (isInv.get(cmdsender.getName()) == null) {
 
-							isInv.put(cmdsender.getName(), true);
-							cmdsender.sendMessage(ChatColor.GRAY + "Spectate inventory turned on.");
+							isInv.put(cmdsender.getName(), false);
+							cmdsender.sendMessage(ChatColor.GRAY + "Spectate inventory turned off.");
 							return true;
 
 						}else {
@@ -348,11 +348,11 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					plugin.SpectateAPI.spectateOff(cmdsender);
 					
-					if (plugin.CommandExecutor.isScrolling.get(cmdsender.getName()) != null) {
+					if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
 
-						if (plugin.CommandExecutor.isScrolling.get(cmdsender.getName())) {
+						if (plugin.CommandExecutor.isScanning.get(cmdsender.getName())) {
 
-							plugin.CommandExecutor.isScrolling.put(cmdsender.getName(), false);
+							plugin.CommandExecutor.isScanning.put(cmdsender.getName(), false);
 							
 							plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(cmdsender.getName()));
 
