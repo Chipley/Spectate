@@ -16,28 +16,34 @@ public class Spectate extends JavaPlugin {
 	public void onEnable() {
 
 		getServer().getPluginManager().registerEvents(Listener, this);
-		
+
 		conf = getConfig();
-		
+
 		if (conf.get("canspectate Permission Enabled?") == null) {
-			
+
 			conf.set("canspectate Permission Enabled?", false);
-			
+
 		}
-		
+
+		if (conf.get("Disable commands while spectating?") == null) {
+
+			conf.set("Disable commands while spectating?", false);
+
+		}
+
 		saveConfig();
 
 		PluginDescriptionFile pdfFile = getDescription();
 
 		System.out.println("[" + pdfFile.getName() + "] " + pdfFile.getName() + " v" + pdfFile.getVersion() + " enabled!");
-		
+
 		Listener.updatePlayer();
 
 		getCommand("spectate").setExecutor(CommandExecutor);
 		getCommand("spec").setExecutor(CommandExecutor);
-		
+
 	}
-	
+
 	public void onDisable() {
 
 		for (Player players : getServer().getOnlinePlayers()) {
@@ -47,13 +53,13 @@ public class Spectate extends JavaPlugin {
 				if (CommandExecutor.isSpectating.get(players.getName())) {
 
 					players.sendMessage("§7You were forced to stop spectating because of a server reload.");
-					
+
 					if (CommandExecutor.isScanning.get(players.getName()) != null) {
 
 						if (CommandExecutor.isScanning.get(players.getName())) {
 
 							CommandExecutor.isScanning.put(players.getName(), false);
-							
+
 							getServer().getScheduler().cancelTask(CommandExecutor.taskId.get(players.getName()));
 
 						}
@@ -71,5 +77,5 @@ public class Spectate extends JavaPlugin {
 		System.out.println("Spectate is disabled!");
 
 	}
-	
+
 }

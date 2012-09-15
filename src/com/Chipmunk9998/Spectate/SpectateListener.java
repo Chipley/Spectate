@@ -23,6 +23,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerAnimationType;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -628,6 +629,22 @@ public class SpectateListener implements Listener {
 					}
 
 				}
+
+			}
+
+		}
+
+	}
+
+	@EventHandler
+	public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
+
+		if (plugin.conf.getBoolean("Disable commands while spectating?")) {
+
+			if (!event.getMessage().startsWith("spectate ") && !event.getMessage().startsWith("spec ")) {
+
+				event.setCancelled(true);
+				return;
 
 			}
 
