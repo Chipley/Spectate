@@ -165,7 +165,7 @@ public class SpectateListener implements Listener {
 
 					Player p = plugin.getServer().getPlayer(player);
 
-					if ((plugin.CommandExecutor.mode.get(p.getName()) != null || plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null || plugin.CommandExecutor.isScanning.get(p.getName()))) {
+					if ((plugin.CommandExecutor.mode.get(p.getName()) != null && plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null && plugin.CommandExecutor.isScanning.get(p.getName()))) {
 
 						ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
 
