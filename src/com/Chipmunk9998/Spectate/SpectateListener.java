@@ -66,7 +66,7 @@ public class SpectateListener implements Listener {
 
 							}
 
-							if (plugin.CommandExecutor.isInv.get(p.getName()) != null || plugin.CommandExecutor.isInv.get(p.getName())) {
+							if (plugin.CommandExecutor.isInv.get(p.getName()) == null || plugin.CommandExecutor.isInv.get(p.getName())) {
 
 								p.getInventory().setContents(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getContents());
 								p.getInventory().setArmorContents(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getArmorContents());
@@ -139,6 +139,18 @@ public class SpectateListener implements Listener {
 			if (plugin.CommandExecutor.isSpectating.get(event.getPlayer().getName())) {
 
 				plugin.SpectateAPI.spectateOff(event.getPlayer());
+				
+				if (plugin.CommandExecutor.isScanning.get(event.getPlayer().getName()) != null) {
+
+					if (plugin.CommandExecutor.isScanning.get(event.getPlayer().getName())) {
+
+						plugin.CommandExecutor.isScanning.put(event.getPlayer().getName(), false);
+						
+						plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(event.getPlayer().getName()));
+
+					}
+
+				}
 
 			}
 		}
@@ -153,7 +165,7 @@ public class SpectateListener implements Listener {
 
 					Player p = plugin.getServer().getPlayer(player);
 
-					if ((plugin.CommandExecutor.mode.get(p.getName()) != null || plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null || plugin.CommandExecutor.isScanning.get(p.getName()))) {	
+					if ((plugin.CommandExecutor.mode.get(p.getName()) != null || plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null || plugin.CommandExecutor.isScanning.get(p.getName()))) {
 
 						ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
 
@@ -179,6 +191,19 @@ public class SpectateListener implements Listener {
 
 							p.sendMessage("§7You were forced to stop spectating because there is nobody left to spectate.");
 							plugin.SpectateAPI.spectateOff(p);
+							
+							if (plugin.CommandExecutor.isScanning.get(p.getName()) != null) {
+
+								if (plugin.CommandExecutor.isScanning.get(p.getName())) {
+
+									plugin.CommandExecutor.isScanning.put(p.getName(), false);
+									
+									plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(p.getName()));
+
+								}
+
+							}
+							
 							return;
 
 						}
@@ -189,6 +214,18 @@ public class SpectateListener implements Listener {
 
 					p.sendMessage("§7You were forced to stop spectating because the person you were spectating disconnected.");
 					plugin.SpectateAPI.spectateOff(p);
+					
+					if (plugin.CommandExecutor.isScanning.get(p.getName()) != null) {
+
+						if (plugin.CommandExecutor.isScanning.get(p.getName())) {
+
+							plugin.CommandExecutor.isScanning.put(p.getName(), false);
+							
+							plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(p.getName()));
+
+						}
+
+					}
 
 				}
 

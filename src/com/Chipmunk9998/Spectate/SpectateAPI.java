@@ -48,7 +48,7 @@ public class SpectateAPI {
 		plugin.CommandExecutor.senderHunger.put(player.getName(), player.getFoodLevel());
 		plugin.CommandExecutor.senderHealth.put(player.getName(), player.getHealth());
 
-		if (plugin.CommandExecutor.isInv.get(player.getName()) != null || plugin.CommandExecutor.isInv.get(player.getName())) {
+		if (plugin.CommandExecutor.isInv.get(player.getName()) == null || plugin.CommandExecutor.isInv.get(player.getName())) {
 
 			plugin.CommandExecutor.senderInv.put(player.getName(), player.getInventory().getContents());
 			plugin.CommandExecutor.senderArm.put(player.getName(), player.getInventory().getArmorContents());
@@ -94,20 +94,8 @@ public class SpectateAPI {
 	public void spectateOff(final Player player) {
 
 		plugin.CommandExecutor.isSpectating.put(player.getName(), false);
-		
-		if (plugin.CommandExecutor.isScanning.get(player.getName()) != null) {
 
-			if (plugin.CommandExecutor.isScanning.get(player.getName())) {
-
-				plugin.CommandExecutor.isScanning.put(player.getName(), false);
-				
-				plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(player.getName()));
-
-			}
-
-		}
-
-		if (plugin.CommandExecutor.isInv.get(player.getName()) != null || plugin.CommandExecutor.isInv.get(player.getName())) {
+		if (plugin.CommandExecutor.isInv.get(player.getName()) == null || plugin.CommandExecutor.isInv.get(player.getName())) {
 
 			player.getInventory().clear();
 			player.getInventory().setContents(plugin.CommandExecutor.senderInv.get(player.getName()));
