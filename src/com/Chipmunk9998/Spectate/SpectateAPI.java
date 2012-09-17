@@ -94,6 +94,18 @@ public class SpectateAPI {
 	public void spectateOff(final Player player) {
 
 		plugin.CommandExecutor.isSpectating.put(player.getName(), false);
+		
+		if (plugin.CommandExecutor.isScanning.get(player.getName()) != null) {
+
+			if (plugin.CommandExecutor.isScanning.get(player.getName())) {
+
+				plugin.CommandExecutor.isScanning.put(player.getName(), false);
+				
+				plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(player.getName()));
+
+			}
+
+		}
 
 		if (plugin.CommandExecutor.isInv.get(player.getName()) != null || plugin.CommandExecutor.isInv.get(player.getName())) {
 

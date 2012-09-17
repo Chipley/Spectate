@@ -355,18 +355,6 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					plugin.SpectateAPI.spectateOff(cmdsender);
 					
-					if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
-
-						if (plugin.CommandExecutor.isScanning.get(cmdsender.getName())) {
-
-							plugin.CommandExecutor.isScanning.put(cmdsender.getName(), false);
-							
-							plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(cmdsender.getName()));
-
-						}
-
-					}
-					
 					return true;
 
 				}
