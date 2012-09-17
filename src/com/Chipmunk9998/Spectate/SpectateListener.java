@@ -367,7 +367,7 @@ public class SpectateListener implements Listener {
 
 					loc.add(dir.multiply(1));
 
-					loc.setY(loc.getY() + 1.5);
+					loc.setY(loc.getY() + 1.4);
 
 					projectile.teleport(loc);
 
