@@ -3,3 +3,4 @@
 - Fixed not being able to enter the scroll mode.
 - Fixed trying to spectate while nobody else is online giving you an error.
 - Fixed scanning while nobody was on putting you in scan mode but not doing anything.
+- Fixed leaving while spectating generating an error.
