@@ -6,22 +6,15 @@ import org.bukkit.entity.Player;
 
 public class SpectateAPI {
 
-	public Spectate plugin;
+	private static Spectate plugin;
 
-	public SpectateAPI(Spectate plugin) {
-
-		this.plugin = plugin;
-
-	}
-
-
-	public void spectateOn(final Player player, final Player target) {
+	public static void spectateOn(final Player player, final Player target) {
 
 		if (plugin.CommandExecutor.isSpectating.get(player.getName()) != null) {
 
 			if (plugin.CommandExecutor.isSpectating.get(player.getName())) {
 
-				plugin.SpectateAPI.spectateOff(player);
+				spectateOff(player);
 
 			}
 
@@ -59,7 +52,7 @@ public class SpectateAPI {
 
 		}
 
-		ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
+		ArrayList<Player> spectateablePlayers = getSpectateablePlayers();
 
 		spectateablePlayers.remove(player);
 
@@ -91,7 +84,7 @@ public class SpectateAPI {
 	}
 
 
-	public void spectateOff(final Player player) {
+	public static void spectateOff(final Player player) {
 
 		plugin.CommandExecutor.isSpectating.put(player.getName(), false);
 
@@ -145,14 +138,13 @@ public class SpectateAPI {
 			p.showPlayer(player);
 
 		}
-
+		
 		player.showPlayer(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(player.getName())));
-		plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(player.getName())).showPlayer(player);
 
 	}
 
 
-	public void scrollLeft(Player player) {
+	public static void scrollLeft(Player player) {
 
 		if (plugin.getServer().getOnlinePlayers().length > 2) {
 
@@ -186,7 +178,7 @@ public class SpectateAPI {
 
 				}
 
-				plugin.SpectateAPI.spectateOn(player, players[players.length - 1]);
+				spectateOn(player, players[players.length - 1]);
 				plugin.Listener.clickEnable(player);
 				return;
 
@@ -198,7 +190,7 @@ public class SpectateAPI {
 
 			}
 
-			plugin.SpectateAPI.spectateOn(player, players[tempPlayerNumber - 1]);
+			spectateOn(player, players[tempPlayerNumber - 1]);
 			plugin.Listener.clickEnable(player);
 
 		}
@@ -206,7 +198,7 @@ public class SpectateAPI {
 	}
 
 
-	public void scrollRight(Player player) {
+	public static void scrollRight(Player player) {
 
 		if (plugin.getServer().getOnlinePlayers().length > 2) {
 
@@ -240,7 +232,7 @@ public class SpectateAPI {
 
 				}
 
-				plugin.SpectateAPI.spectateOn(player, players[0]);
+				spectateOn(player, players[0]);
 				plugin.Listener.clickEnable(player);
 				return;
 
@@ -252,7 +244,7 @@ public class SpectateAPI {
 
 			}
 
-			plugin.SpectateAPI.spectateOn(player, players[tempPlayerNumber + 1]);
+			spectateOn(player, players[tempPlayerNumber + 1]);
 			plugin.Listener.clickEnable(player);
 
 		}
@@ -260,7 +252,7 @@ public class SpectateAPI {
 	}
 
 
-	public void spectateScan(int interval, final Player player) {
+	public static void spectateScan(int interval, final Player player) {
 
 		plugin.CommandExecutor.taskId.put(player.getName(), plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -278,12 +270,12 @@ public class SpectateAPI {
 
 			}
 
-		}, 0L, interval * 20L));
+		}, interval * 20L, interval * 20L));
 
 	}
 
 
-	public ArrayList<Player> getSpectateablePlayers() {
+	public static ArrayList<Player> getSpectateablePlayers() {
 
 		ArrayList<Player> spectateablePlayers = new ArrayList<Player>();
 

@@ -138,7 +138,7 @@ public class SpectateListener implements Listener {
 
 			if (plugin.CommandExecutor.isSpectating.get(event.getPlayer().getName())) {
 
-				plugin.SpectateAPI.spectateOff(event.getPlayer());
+				SpectateAPI.spectateOff(event.getPlayer());
 
 				if (plugin.CommandExecutor.isScanning.get(event.getPlayer().getName()) != null) {
 
@@ -167,7 +167,7 @@ public class SpectateListener implements Listener {
 
 					if ((plugin.CommandExecutor.mode.get(p.getName()) != null && plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null && plugin.CommandExecutor.isScanning.get(p.getName()))) {
 
-						ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
+						ArrayList<Player> spectateablePlayers = SpectateAPI.getSpectateablePlayers();
 
 						spectateablePlayers.remove(event.getPlayer());
 
@@ -177,12 +177,12 @@ public class SpectateListener implements Listener {
 
 							if (plugin.CommandExecutor.playerNumber.get(p.getName()) > players.length - 1) {
 
-								plugin.SpectateAPI.spectateOn(p, players[0]);
+								SpectateAPI.spectateOn(p, players[0]);
 								p.sendMessage("§7The person you were previously spectating has disconnected.");
 
 							}else {
 
-								plugin.SpectateAPI.spectateOn(p, players[plugin.CommandExecutor.playerNumber.get(p.getName())]);
+								SpectateAPI.spectateOn(p, players[plugin.CommandExecutor.playerNumber.get(p.getName())]);
 								p.sendMessage("§7The person you were previously spectating has disconnected.");
 
 							}
@@ -190,7 +190,7 @@ public class SpectateListener implements Listener {
 						}catch (ArrayIndexOutOfBoundsException e) {
 
 							p.sendMessage("§7You were forced to stop spectating because there is nobody left to spectate.");
-							plugin.SpectateAPI.spectateOff(p);
+							SpectateAPI.spectateOff(p);
 
 							if (plugin.CommandExecutor.isScanning.get(p.getName()) != null) {
 
@@ -213,7 +213,7 @@ public class SpectateListener implements Listener {
 					}
 
 					p.sendMessage("§7You were forced to stop spectating because the person you were spectating disconnected.");
-					plugin.SpectateAPI.spectateOff(p);
+					SpectateAPI.spectateOff(p);
 
 					if (plugin.CommandExecutor.isScanning.get(p.getName()) != null) {
 
@@ -398,7 +398,7 @@ public class SpectateListener implements Listener {
 
 						if ((plugin.CommandExecutor.mode.get(p.getName()) != null && plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null && plugin.CommandExecutor.isScanning.get(p.getName()))) {
 
-							ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
+							ArrayList<Player> spectateablePlayers = SpectateAPI.getSpectateablePlayers();
 
 							spectateablePlayers.remove(p);
 
@@ -408,11 +408,11 @@ public class SpectateListener implements Listener {
 
 								if (plugin.CommandExecutor.playerNumber.get(p.getName()) > players.length - 1) {
 
-									plugin.SpectateAPI.spectateOn(p, players[0]);
+									SpectateAPI.spectateOn(p, players[0]);
 
 								}else {
 
-									plugin.SpectateAPI.spectateOn(p, players[plugin.CommandExecutor.playerNumber.get(p.getName())]);
+									SpectateAPI.spectateOn(p, players[plugin.CommandExecutor.playerNumber.get(p.getName())]);
 
 								}
 
@@ -421,7 +421,7 @@ public class SpectateListener implements Listener {
 							}catch (ArrayIndexOutOfBoundsException e) {
 
 								p.sendMessage("§7You were forced to stop spectating because there is nobody left to spectate.");
-								plugin.SpectateAPI.spectateOff(p);
+								SpectateAPI.spectateOff(p);
 								e.printStackTrace();
 
 							}
@@ -432,7 +432,7 @@ public class SpectateListener implements Listener {
 
 						p.sendMessage("§7You were forced to stop spectating because the person you were spectating died.");
 
-						plugin.SpectateAPI.spectateOff(p);
+						SpectateAPI.spectateOff(p);
 
 					}
 
@@ -469,7 +469,7 @@ public class SpectateListener implements Listener {
 
 								}
 
-								plugin.SpectateAPI.scrollLeft(event.getPlayer());
+								SpectateAPI.scrollLeft(event.getPlayer());
 
 							}
 
@@ -510,7 +510,7 @@ public class SpectateListener implements Listener {
 
 							}
 
-							plugin.SpectateAPI.scrollRight(event.getPlayer());
+							SpectateAPI.scrollRight(event.getPlayer());
 
 						}
 
@@ -549,7 +549,7 @@ public class SpectateListener implements Listener {
 
 								}
 
-								plugin.SpectateAPI.scrollRight(event.getPlayer());
+								SpectateAPI.scrollRight(event.getPlayer());
 
 
 							}

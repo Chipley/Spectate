@@ -68,7 +68,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 							cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
 
-							plugin.SpectateAPI.spectateOff(cmdsender);
+							SpectateAPI.spectateOff(cmdsender);
 
 							if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
 
@@ -184,7 +184,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
+					ArrayList<Player> spectateablePlayers = SpectateAPI.getSpectateablePlayers();
 
 					spectateablePlayers.remove(cmdsender);
 
@@ -194,7 +194,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 						if (isSpectating.get(cmdsender.getName()) == null || !isSpectating.get(cmdsender.getName())) {
 
-							plugin.SpectateAPI.spectateOn(cmdsender, specPlayers[0]);
+							SpectateAPI.spectateOn(cmdsender, specPlayers[0]);
 
 						}
 
@@ -206,7 +206,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					}
 
 					isScanning.put(cmdsender.getName(), true);
-					plugin.SpectateAPI.spectateScan(interval, cmdsender);
+					SpectateAPI.spectateScan(interval, cmdsender);
 					return true;
 
 				}
@@ -327,7 +327,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					plugin.SpectateAPI.spectateOn(cmdsender, targetPlayer);
+					SpectateAPI.spectateOn(cmdsender, targetPlayer);
 					return true;
 
 				}
@@ -350,7 +350,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
 
-					plugin.SpectateAPI.spectateOff(cmdsender);
+					SpectateAPI.spectateOff(cmdsender);
 
 					if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
 
@@ -374,7 +374,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				if (plugin.CommandExecutor.mode.get(cmdsender.getName()).equals("2")) {
 
-					ArrayList<Player> spectateablePlayers = plugin.SpectateAPI.getSpectateablePlayers();
+					ArrayList<Player> spectateablePlayers = SpectateAPI.getSpectateablePlayers();
 
 					spectateablePlayers.remove(cmdsender);
 
@@ -401,7 +401,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 						}
 
-						plugin.SpectateAPI.spectateOn(cmdsender, players[0]);
+						SpectateAPI.spectateOn(cmdsender, players[0]);
 						playerNumber.put(cmdsender.getName(), 0);
 						return true;
 
