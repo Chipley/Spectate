@@ -13,6 +13,8 @@ public class Spectate extends JavaPlugin {
 	public SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
 
 	public void onEnable() {
+		
+		SpectateAPI.setPlugin(this);
 
 		getServer().getPluginManager().registerEvents(Listener, this);
 

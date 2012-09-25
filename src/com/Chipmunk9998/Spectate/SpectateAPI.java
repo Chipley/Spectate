@@ -10,9 +10,9 @@ public class SpectateAPI {
 
 	public static void spectateOn(final Player player, final Player target) {
 
-		if (plugin.CommandExecutor.isSpectating.get(player.getName()) != null) {
+		if (getPlugin().CommandExecutor.isSpectating.get(player.getName()) != null) {
 
-			if (plugin.CommandExecutor.isSpectating.get(player.getName())) {
+			if (getPlugin().CommandExecutor.isSpectating.get(player.getName())) {
 
 				spectateOff(player);
 
@@ -21,30 +21,30 @@ public class SpectateAPI {
 		}
 
 		player.sendMessage("§7You are now spectating " + target.getName() + ".");
-		plugin.CommandExecutor.origLocation.put(player.getName(), player.getLocation());
-		plugin.CommandExecutor.isSpectating.put(player.getName(), true);
-		plugin.CommandExecutor.isBeingSpectated.put(target.getName(), true);
+		getPlugin().CommandExecutor.origLocation.put(player.getName(), player.getLocation());
+		getPlugin().CommandExecutor.isSpectating.put(player.getName(), true);
+		getPlugin().CommandExecutor.isBeingSpectated.put(target.getName(), true);
 
-		if (plugin.CommandExecutor.spectator.get(target.getName()) == null) {
+		if (getPlugin().CommandExecutor.spectator.get(target.getName()) == null) {
 
-			plugin.CommandExecutor.spectator.put(target.getName(), player.getName());
+			getPlugin().CommandExecutor.spectator.put(target.getName(), player.getName());
 
 		}else {
 
-			plugin.CommandExecutor.spectator.put(target.getName(), plugin.CommandExecutor.spectator.get(target.getName()) + "," + player.getName());
+			getPlugin().CommandExecutor.spectator.put(target.getName(), getPlugin().CommandExecutor.spectator.get(target.getName()) + "," + player.getName());
 
 		}
 
 
-		plugin.CommandExecutor.target.put(player.getName(), target.getName());
-		player.getPlayer().teleport(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(player.getName())));
-		plugin.CommandExecutor.senderHunger.put(player.getName(), player.getFoodLevel());
-		plugin.CommandExecutor.senderHealth.put(player.getName(), player.getHealth());
+		getPlugin().CommandExecutor.target.put(player.getName(), target.getName());
+		player.getPlayer().teleport(getPlugin().getServer().getPlayer(getPlugin().CommandExecutor.target.get(player.getName())));
+		getPlugin().CommandExecutor.senderHunger.put(player.getName(), player.getFoodLevel());
+		getPlugin().CommandExecutor.senderHealth.put(player.getName(), player.getHealth());
 
-		if (plugin.CommandExecutor.isInv.get(player.getName()) == null || plugin.CommandExecutor.isInv.get(player.getName())) {
+		if (getPlugin().CommandExecutor.isInv.get(player.getName()) == null || getPlugin().CommandExecutor.isInv.get(player.getName())) {
 
-			plugin.CommandExecutor.senderInv.put(player.getName(), player.getInventory().getContents());
-			plugin.CommandExecutor.senderArm.put(player.getName(), player.getInventory().getArmorContents());
+			getPlugin().CommandExecutor.senderInv.put(player.getName(), player.getInventory().getContents());
+			getPlugin().CommandExecutor.senderArm.put(player.getName(), player.getInventory().getArmorContents());
 
 			player.getInventory().clear();
 			player.getInventory().setContents(target.getInventory().getContents());
@@ -60,7 +60,7 @@ public class SpectateAPI {
 
 		for (Player p : spectateablePlayers) {
 
-			if (plugin.CommandExecutor.target.get(player.getName()).equals(p.getName())) {
+			if (getPlugin().CommandExecutor.target.get(player.getName()).equals(p.getName())) {
 
 				break;
 
@@ -70,9 +70,9 @@ public class SpectateAPI {
 
 		}
 
-		plugin.CommandExecutor.playerNumber.put(player.getName(), tempPlayerNumber);
+		getPlugin().CommandExecutor.playerNumber.put(player.getName(), tempPlayerNumber);
 
-		for (Player player1 : plugin.getServer().getOnlinePlayers()) {
+		for (Player player1 : getPlugin().getServer().getOnlinePlayers()) {
 
 			player1.hidePlayer(player);
 
@@ -86,26 +86,26 @@ public class SpectateAPI {
 
 	public static void spectateOff(final Player player) {
 
-		plugin.CommandExecutor.isSpectating.put(player.getName(), false);
+		getPlugin().CommandExecutor.isSpectating.put(player.getName(), false);
 
-		if (plugin.CommandExecutor.isInv.get(player.getName()) == null || plugin.CommandExecutor.isInv.get(player.getName())) {
+		if (getPlugin().CommandExecutor.isInv.get(player.getName()) == null || getPlugin().CommandExecutor.isInv.get(player.getName())) {
 
 			player.getInventory().clear();
-			player.getInventory().setContents(plugin.CommandExecutor.senderInv.get(player.getName()));
-			player.getInventory().setArmorContents(plugin.CommandExecutor.senderArm.get(player.getName()));
+			player.getInventory().setContents(getPlugin().CommandExecutor.senderInv.get(player.getName()));
+			player.getInventory().setArmorContents(getPlugin().CommandExecutor.senderArm.get(player.getName()));
 
 		}
 
-		player.teleport(plugin.CommandExecutor.origLocation.get(player.getName()));
+		player.teleport(getPlugin().CommandExecutor.origLocation.get(player.getName()));
 
-		player.setHealth(plugin.CommandExecutor.senderHealth.get(player.getName()));
-		player.setFoodLevel(plugin.CommandExecutor.senderHunger.get(player.getName()));
+		player.setHealth(getPlugin().CommandExecutor.senderHealth.get(player.getName()));
+		player.setFoodLevel(getPlugin().CommandExecutor.senderHunger.get(player.getName()));
 
 		player.setFireTicks(0);
 
-		String[] spectators = plugin.CommandExecutor.spectator.get(plugin.CommandExecutor.target.get(player.getName())).split(",");
+		String[] spectators = getPlugin().CommandExecutor.spectator.get(getPlugin().CommandExecutor.target.get(player.getName())).split(",");
 
-		plugin.CommandExecutor.spectator.put(plugin.CommandExecutor.target.get(player.getName()), null);
+		getPlugin().CommandExecutor.spectator.put(getPlugin().CommandExecutor.target.get(player.getName()), null);
 
 		if (spectators.length > 1) {
 
@@ -113,13 +113,13 @@ public class SpectateAPI {
 
 				if (!players.equals(player.getName())) {
 
-					if (plugin.CommandExecutor.spectator.get(plugin.CommandExecutor.target.get(player.getName())) == null) {
+					if (getPlugin().CommandExecutor.spectator.get(getPlugin().CommandExecutor.target.get(player.getName())) == null) {
 
-						plugin.CommandExecutor.spectator.put(plugin.CommandExecutor.target.get(player.getName()), players);
+						getPlugin().CommandExecutor.spectator.put(getPlugin().CommandExecutor.target.get(player.getName()), players);
 
 					}else {
 
-						plugin.CommandExecutor.spectator.put(plugin.CommandExecutor.target.get(player.getName()), plugin.CommandExecutor.spectator.get(plugin.CommandExecutor.target.get(player.getName())) + "," + players);
+						getPlugin().CommandExecutor.spectator.put(getPlugin().CommandExecutor.target.get(player.getName()), getPlugin().CommandExecutor.spectator.get(getPlugin().CommandExecutor.target.get(player.getName())) + "," + players);
 
 					}
 
@@ -129,24 +129,29 @@ public class SpectateAPI {
 
 		}else {
 
-			plugin.CommandExecutor.isBeingSpectated.put(plugin.CommandExecutor.target.get(player.getName()), false);
+			getPlugin().CommandExecutor.isBeingSpectated.put(getPlugin().CommandExecutor.target.get(player.getName()), false);
 
 		}
 
-		for (Player p : plugin.getServer().getOnlinePlayers()) {
+		for (Player p : getPlugin().getServer().getOnlinePlayers()) {
 
 			p.showPlayer(player);
 
 		}
 		
-		player.showPlayer(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(player.getName())));
+		player.showPlayer(getPlugin().getServer().getPlayer(getPlugin().CommandExecutor.target.get(player.getName())));
 
 	}
 
+	public static void setMode(String player, String mode) {
+		
+		getPlugin().CommandExecutor.mode.put(player, mode);
+		
+	}
 
 	public static void scrollLeft(Player player) {
 
-		if (plugin.getServer().getOnlinePlayers().length > 2) {
+		if (getPlugin().getServer().getOnlinePlayers().length > 2) {
 
 			ArrayList<Player> spectateablePlayers = getSpectateablePlayers();
 
@@ -158,7 +163,7 @@ public class SpectateAPI {
 
 			for (Player p : players) {
 
-				if (plugin.CommandExecutor.target.get(player.getName()).equals(p.getName())) {
+				if (getPlugin().CommandExecutor.target.get(player.getName()).equals(p.getName())) {
 
 					break;
 
@@ -168,30 +173,30 @@ public class SpectateAPI {
 
 			}
 
-			plugin.CommandExecutor.playerNumber.put(player.getName(), tempPlayerNumber);
+			getPlugin().CommandExecutor.playerNumber.put(player.getName(), tempPlayerNumber);
 
 			if (tempPlayerNumber == 0) {
 
-				if (players[players.length - 1].getName().equals(plugin.CommandExecutor.target.get(player.getName()))) {
+				if (players[players.length - 1].getName().equals(getPlugin().CommandExecutor.target.get(player.getName()))) {
 
 					return;
 
 				}
 
 				spectateOn(player, players[players.length - 1]);
-				plugin.Listener.clickEnable(player);
+				getPlugin().Listener.clickEnable(player);
 				return;
 
 			}
 
-			if (players[tempPlayerNumber - 1].getName().equals(plugin.CommandExecutor.target.get(player.getName()))) {
+			if (players[tempPlayerNumber - 1].getName().equals(getPlugin().CommandExecutor.target.get(player.getName()))) {
 
 				return;
 
 			}
 
 			spectateOn(player, players[tempPlayerNumber - 1]);
-			plugin.Listener.clickEnable(player);
+			getPlugin().Listener.clickEnable(player);
 
 		}
 
@@ -200,7 +205,7 @@ public class SpectateAPI {
 
 	public static void scrollRight(Player player) {
 
-		if (plugin.getServer().getOnlinePlayers().length > 2) {
+		if (getPlugin().getServer().getOnlinePlayers().length > 2) {
 
 			ArrayList<Player> spectateablePlayers = getSpectateablePlayers();
 
@@ -212,7 +217,7 @@ public class SpectateAPI {
 
 			for (Player p : players) {
 
-				if (plugin.CommandExecutor.target.get(player.getName()).equals(p.getName())) {
+				if (getPlugin().CommandExecutor.target.get(player.getName()).equals(p.getName())) {
 
 					break;
 
@@ -222,30 +227,30 @@ public class SpectateAPI {
 
 			}
 
-			plugin.CommandExecutor.playerNumber.put(player.getName(), tempPlayerNumber);
+			getPlugin().CommandExecutor.playerNumber.put(player.getName(), tempPlayerNumber);
 
 			if (tempPlayerNumber == players.length - 1) {
 
-				if (players[0].getName().equals(plugin.CommandExecutor.target.get(player.getName()))) {
+				if (players[0].getName().equals(getPlugin().CommandExecutor.target.get(player.getName()))) {
 
 					return;
 
 				}
 
 				spectateOn(player, players[0]);
-				plugin.Listener.clickEnable(player);
+				getPlugin().Listener.clickEnable(player);
 				return;
 
 			}
 
-			if (players[tempPlayerNumber + 1].getName().equals(plugin.CommandExecutor.target.get(player.getName()))) {
+			if (players[tempPlayerNumber + 1].getName().equals(getPlugin().CommandExecutor.target.get(player.getName()))) {
 
 				return;
 
 			}
 
 			spectateOn(player, players[tempPlayerNumber + 1]);
-			plugin.Listener.clickEnable(player);
+			getPlugin().Listener.clickEnable(player);
 
 		}
 
@@ -254,7 +259,7 @@ public class SpectateAPI {
 
 	public static void spectateScan(int interval, final Player player) {
 
-		plugin.CommandExecutor.taskId.put(player.getName(), plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+		getPlugin().CommandExecutor.taskId.put(player.getName(), getPlugin().getServer().getScheduler().scheduleSyncRepeatingTask(getPlugin(), new Runnable() {
 
 			public void run() {
 
@@ -279,7 +284,7 @@ public class SpectateAPI {
 
 		ArrayList<Player> spectateablePlayers = new ArrayList<Player>();
 
-		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
+		for (Player onlinePlayers : getPlugin().getServer().getOnlinePlayers()) {
 
 			if (onlinePlayers.isDead()) {
 
@@ -287,9 +292,9 @@ public class SpectateAPI {
 
 			}
 
-			if (plugin.CommandExecutor.isSpectating.get(onlinePlayers.getName()) != null) {
+			if (getPlugin().CommandExecutor.isSpectating.get(onlinePlayers.getName()) != null) {
 
-				if (plugin.CommandExecutor.isSpectating.get(onlinePlayers.getName())) {
+				if (getPlugin().CommandExecutor.isSpectating.get(onlinePlayers.getName())) {
 
 					continue;
 
@@ -297,7 +302,7 @@ public class SpectateAPI {
 
 			}
 
-			if (plugin.conf.getBoolean("canspectate Permission Enabled?")) {
+			if (getPlugin().conf.getBoolean("canspectate Permission Enabled?")) {
 
 				if (onlinePlayers.hasPermission("spectate.cantspectate")) {
 
@@ -313,6 +318,16 @@ public class SpectateAPI {
 
 		return spectateablePlayers;
 
+	}
+
+
+	public static void setPlugin(Spectate plugin) {
+		SpectateAPI.plugin = plugin;
+	}
+
+
+	public static Spectate getPlugin() {
+		return plugin;
 	}
 
 }
