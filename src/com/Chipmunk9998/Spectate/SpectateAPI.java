@@ -7,8 +7,9 @@ import org.bukkit.entity.Player;
 public class SpectateAPI {
 
 	private static Spectate plugin;
+	
 
-	public static void spectateOn(final Player player, final Player target) {
+	public static void spectateOn(Player player, Player target) {
 
 		if (getPlugin().CommandExecutor.isSpectating.get(player.getName()) != null) {
 
@@ -84,7 +85,7 @@ public class SpectateAPI {
 	}
 
 
-	public static void spectateOff(final Player player) {
+	public static void spectateOff(Player player) {
 
 		getPlugin().CommandExecutor.isSpectating.put(player.getName(), false);
 
@@ -142,12 +143,7 @@ public class SpectateAPI {
 		player.showPlayer(getPlugin().getServer().getPlayer(getPlugin().CommandExecutor.target.get(player.getName())));
 
 	}
-
-	public static void setMode(String player, String mode) {
-		
-		getPlugin().CommandExecutor.mode.put(player, mode);
-		
-	}
+	
 
 	public static void scrollLeft(Player player) {
 
@@ -319,15 +315,25 @@ public class SpectateAPI {
 		return spectateablePlayers;
 
 	}
-
+	
+	public static void setMode(String player, String mode) {
+		
+		getPlugin().CommandExecutor.mode.put(player, mode);
+		
+	}
+	
 
 	public static void setPlugin(Spectate plugin) {
+		
 		SpectateAPI.plugin = plugin;
+		
 	}
-
+	
 
 	public static Spectate getPlugin() {
+		
 		return plugin;
+		
 	}
 
 }
