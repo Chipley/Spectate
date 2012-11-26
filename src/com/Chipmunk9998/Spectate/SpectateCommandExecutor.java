@@ -2,6 +2,8 @@ package com.Chipmunk9998.Spectate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -9,6 +11,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.kitteh.vanish.staticaccess.VanishNoPacket;
+import org.kitteh.vanish.staticaccess.VanishNotLoadedException;
 
 public class SpectateCommandExecutor implements CommandExecutor {
 
@@ -69,7 +73,18 @@ public class SpectateCommandExecutor implements CommandExecutor {
 							cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
 
 							SpectateAPI.spectateOff(cmdsender);
-
+							if(Bukkit.getServer().getPluginManager().getPlugin("VanishNoPacket") != null) {
+								try {
+									VanishNoPacket.toggleVanishSilent(cmdsender);
+								} catch (VanishNotLoadedException e) {
+									e.printStackTrace();
+								}
+								try {
+									VanishNoPacket.toggleVanishSilent(cmdsender);
+								} catch (VanishNotLoadedException e) {
+									e.printStackTrace();
+								}
+							}
 							if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
 
 								if (plugin.CommandExecutor.isScanning.get(cmdsender.getName())) {
