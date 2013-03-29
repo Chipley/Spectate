@@ -31,7 +31,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -97,6 +96,9 @@ public class SpectateListener implements Listener {
 						}
 
 						p.setFoodLevel(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getFoodLevel());
+						
+						((CraftPlayer)p).getHandle().inventory.itemInHandIndex = plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getHeldItemSlot();
+						((CraftPlayer)p).getHandle().playerConnection.sendPacket(new Packet16BlockItemSwitch(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getHeldItemSlot()));
 
 					}
 
@@ -663,31 +665,6 @@ public class SpectateListener implements Listener {
 
 	}
 
-	@EventHandler
-	public void onPlayerItemHeld(PlayerItemHeldEvent event) {
-
-		if (plugin.CommandExecutor.isBeingSpectated.contains(event.getPlayer().getName())) {
-
-			String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer().getName()).split(",");
-
-			for (String player : spectators) {
-
-				Player p = plugin.getServer().getPlayer(player);
-
-				((CraftPlayer)p).getHandle().inventory.itemInHandIndex = event.getNewSlot();
-				((CraftPlayer)p).getHandle().playerConnection.sendPacket(new Packet16BlockItemSwitch(event.getNewSlot()));
-
-			}
-
-		}else if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
-			
-			((CraftPlayer)event.getPlayer()).getHandle().inventory.itemInHandIndex = event.getPreviousSlot();
-			((CraftPlayer)event.getPlayer()).getHandle().playerConnection.sendPacket(new Packet16BlockItemSwitch(event.getPreviousSlot()));
-			
-		}
-
-	}
-
 	public Location getThirdPersonLocation(Player player, boolean front) {
 
 		Location playerLoc = player.getLocation();
@@ -703,13 +680,13 @@ public class SpectateListener implements Listener {
 			v.multiply(currentSubtraction);
 
 			if (front) {
-				
+
 				playerLoc.add(v);
 
 			}else {
-				
+
 				playerLoc.subtract(v);
-				
+
 			}
 
 			Material tempMat = new Location(playerLoc.getWorld(), playerLoc.getX(), playerLoc.getY() + 1.5, playerLoc.getZ()).getBlock().getType();
