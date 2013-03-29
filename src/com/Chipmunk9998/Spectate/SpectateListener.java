@@ -3,7 +3,7 @@ package com.Chipmunk9998.Spectate;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import net.minecraft.server.v1_5_R1.Packet16BlockItemSwitch;
+import net.minecraft.server.v1_5_R2.Packet16BlockItemSwitch;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,7 +37,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
-import org.bukkit.craftbukkit.v1_5_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
 
 public class SpectateListener implements Listener {
 

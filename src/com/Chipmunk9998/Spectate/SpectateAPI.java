@@ -2,9 +2,9 @@ package com.Chipmunk9998.Spectate;
 
 import java.util.ArrayList;
 
-import net.minecraft.server.v1_5_R1.Packet16BlockItemSwitch;
+import net.minecraft.server.v1_5_R2.Packet16BlockItemSwitch;
 
-import org.bukkit.craftbukkit.v1_5_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 public class SpectateAPI {
