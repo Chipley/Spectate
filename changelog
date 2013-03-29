@@ -1,6 +1,5 @@
-- Changed inventory to be on by default.
-- Added an option in the config for disabling commands while spectating.
-- Fixed not being able to enter the scroll mode.
-- Fixed trying to spectate while nobody else is online giving you an error.
-- Fixed scanning while nobody was on putting you in scan mode but not doing anything.
-- Fixed leaving while spectating generating an error.
+#- Added control mode. Typing '/control [PlayerName]' lets you control the player, which makes it look like the target player is doing everything you're doing.
+- Added third person mode. To toggle between first person and third person mode, type '/spectate angle [firstperson/thirdperson]'.
+- Added 7 new permissions: spectate.on, spectate.off, spectate.mode, spectate.angle, spectate.scan, spectate.inv, and spectate.help.
+- Fixed spectating players being able to change their current item selected in the hotbar.
+- Updated to 1.5.1.

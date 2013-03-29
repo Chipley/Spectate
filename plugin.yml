@@ -1,7 +1,9 @@
 name: Spectate
 main: com.Chipmunk9998.Spectate.Spectate
-version: 1.9.1
+version: 1.11
 commands:
     spectate:
         description: Lets you spectate another user
         aliases: [spec]
+    control:
+        description: Lets you control another user

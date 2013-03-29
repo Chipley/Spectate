@@ -13,7 +13,7 @@ public class Spectate extends JavaPlugin {
 	public SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
 
 	public void onEnable() {
-		
+
 		SpectateAPI.setPlugin(this);
 
 		getServer().getPluginManager().registerEvents(Listener, this);
@@ -42,6 +42,7 @@ public class Spectate extends JavaPlugin {
 
 		getCommand("spectate").setExecutor(CommandExecutor);
 		getCommand("spec").setExecutor(CommandExecutor);
+		//getCommand("control").setExecutor(CommandExecutor);
 
 	}
 
@@ -49,27 +50,23 @@ public class Spectate extends JavaPlugin {
 
 		for (Player players : getServer().getOnlinePlayers()) {
 
-			if (CommandExecutor.isSpectating.get(players.getName()) != null) {
+			if (CommandExecutor.isSpectating.contains(players.getName())) {
 
-				if (CommandExecutor.isSpectating.get(players.getName())) {
+				players.sendMessage("§7You were forced to stop spectating because of a server reload.");
 
-					players.sendMessage("§7You were forced to stop spectating because of a server reload.");
+				if (CommandExecutor.isScanning.get(players.getName()) != null) {
 
-					if (CommandExecutor.isScanning.get(players.getName()) != null) {
+					if (CommandExecutor.isScanning.get(players.getName())) {
 
-						if (CommandExecutor.isScanning.get(players.getName())) {
+						CommandExecutor.isScanning.put(players.getName(), false);
 
-							CommandExecutor.isScanning.put(players.getName(), false);
-
-							getServer().getScheduler().cancelTask(CommandExecutor.taskId.get(players.getName()));
-
-						}
+						getServer().getScheduler().cancelTask(CommandExecutor.taskId.get(players.getName()));
 
 					}
 
-					SpectateAPI.spectateOff(players);
-
 				}
+
+				SpectateAPI.spectateOff(players);
 
 			}
 

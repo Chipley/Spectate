@@ -2,29 +2,44 @@ package com.Chipmunk9998.Spectate;
 
 import java.util.ArrayList;
 
+import net.minecraft.server.v1_5_R1.Packet16BlockItemSwitch;
+
+import org.bukkit.craftbukkit.v1_5_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 public class SpectateAPI {
 
 	private static Spectate plugin;
-	
+
 
 	public static void spectateOn(Player player, Player target) {
 
-		if (getPlugin().CommandExecutor.isSpectating.get(player.getName()) != null) {
+		if (getPlugin().CommandExecutor.isSpectating.contains(player.getName())) {
 
-			if (getPlugin().CommandExecutor.isSpectating.get(player.getName())) {
-
-				spectateOff(player);
-
-			}
+			spectateOff(player);
 
 		}
 
-		player.sendMessage("§7You are now spectating " + target.getName() + ".");
+		if (!plugin.CommandExecutor.isControlling.contains(target.getName())) {
+
+			player.sendMessage("§7You are now spectating " + target.getName() + ".");
+
+		}else {
+
+			plugin.CommandExecutor.mode.remove(player.getName());
+			plugin.CommandExecutor.isInv.remove(player.getName());
+
+		}
+		
+		if (plugin.CommandExecutor.playerAngle.get(player.getName()) == null) {
+			
+			plugin.CommandExecutor.playerAngle.put(player.getName(), 1);
+			
+		}
+
 		getPlugin().CommandExecutor.origLocation.put(player.getName(), player.getLocation());
-		getPlugin().CommandExecutor.isSpectating.put(player.getName(), true);
-		getPlugin().CommandExecutor.isBeingSpectated.put(target.getName(), true);
+		getPlugin().CommandExecutor.isSpectating.add(player.getName());
+		getPlugin().CommandExecutor.isBeingSpectated.add(target.getName());
 
 		if (getPlugin().CommandExecutor.spectator.get(target.getName()) == null) {
 
@@ -38,7 +53,6 @@ public class SpectateAPI {
 
 
 		getPlugin().CommandExecutor.target.put(player.getName(), target.getName());
-		player.getPlayer().teleport(getPlugin().getServer().getPlayer(getPlugin().CommandExecutor.target.get(player.getName())));
 		getPlugin().CommandExecutor.senderHunger.put(player.getName(), player.getFoodLevel());
 		getPlugin().CommandExecutor.senderHealth.put(player.getName(), player.getHealth());
 
@@ -52,6 +66,11 @@ public class SpectateAPI {
 			player.getInventory().setArmorContents(target.getInventory().getArmorContents());
 
 		}
+
+		getPlugin().CommandExecutor.senderSlot.put(player.getName(), player.getInventory().getHeldItemSlot());
+
+		((CraftPlayer)player).getHandle().inventory.itemInHandIndex = target.getInventory().getHeldItemSlot();
+		((CraftPlayer)player).getHandle().playerConnection.sendPacket(new Packet16BlockItemSwitch(target.getInventory().getHeldItemSlot()));
 
 		ArrayList<Player> spectateablePlayers = getSpectateablePlayers();
 
@@ -73,21 +92,38 @@ public class SpectateAPI {
 
 		getPlugin().CommandExecutor.playerNumber.put(player.getName(), tempPlayerNumber);
 
-		for (Player player1 : getPlugin().getServer().getOnlinePlayers()) {
+		if (!plugin.CommandExecutor.isControlling.contains(target.getName())) {
 
-			player1.hidePlayer(player);
+			for (Player player1 : getPlugin().getServer().getOnlinePlayers()) {
+
+				player1.hidePlayer(player);
+
+			}
 
 		}
 
-		target.hidePlayer(player);
-		player.hidePlayer(target);
+		if (plugin.CommandExecutor.playerAngle.get(player.getName()) == 1) {
+
+			player.hidePlayer(target);
+
+		}
+
+		if (plugin.CommandExecutor.playerAngle.get(player.getName()) == 2 || plugin.CommandExecutor.playerAngle.get(player.getName()) == 3) {
+
+			player.teleport(plugin.Listener.getThirdPersonLocation(target, (plugin.CommandExecutor.playerAngle.get(player.getName()) == 2 ? false : true)));
+
+		}else {
+
+			player.getPlayer().teleport(getPlugin().getServer().getPlayer(getPlugin().CommandExecutor.target.get(player.getName())));
+
+		}
 
 	}
 
 
 	public static void spectateOff(Player player) {
 
-		getPlugin().CommandExecutor.isSpectating.put(player.getName(), false);
+		getPlugin().CommandExecutor.isSpectating.remove(player.getName());
 
 		if (getPlugin().CommandExecutor.isInv.get(player.getName()) == null || getPlugin().CommandExecutor.isInv.get(player.getName())) {
 
@@ -103,6 +139,9 @@ public class SpectateAPI {
 		player.setFoodLevel(getPlugin().CommandExecutor.senderHunger.get(player.getName()));
 
 		player.setFireTicks(0);
+
+		((CraftPlayer)player).getHandle().inventory.itemInHandIndex = getPlugin().CommandExecutor.senderSlot.get(player.getName());
+		((CraftPlayer)player).getHandle().playerConnection.sendPacket(new Packet16BlockItemSwitch(getPlugin().CommandExecutor.senderSlot.get(player.getName())));
 
 		String[] spectators = getPlugin().CommandExecutor.spectator.get(getPlugin().CommandExecutor.target.get(player.getName())).split(",");
 
@@ -130,7 +169,7 @@ public class SpectateAPI {
 
 		}else {
 
-			getPlugin().CommandExecutor.isBeingSpectated.put(getPlugin().CommandExecutor.target.get(player.getName()), false);
+			getPlugin().CommandExecutor.isBeingSpectated.remove(getPlugin().CommandExecutor.target.get(player.getName()));
 
 		}
 
@@ -139,11 +178,18 @@ public class SpectateAPI {
 			p.showPlayer(player);
 
 		}
-		
+
 		player.showPlayer(getPlugin().getServer().getPlayer(getPlugin().CommandExecutor.target.get(player.getName())));
 
+		getPlugin().CommandExecutor.senderInv.remove(player.getName());
+		getPlugin().CommandExecutor.senderArm.remove(player.getName());
+		getPlugin().CommandExecutor.origLocation.remove(player.getName());
+		getPlugin().CommandExecutor.senderHealth.remove(player.getName());
+		getPlugin().CommandExecutor.senderHunger.remove(player.getName());
+		getPlugin().CommandExecutor.target.remove(player.getName());
+
 	}
-	
+
 
 	public static void scrollLeft(Player player) {
 
@@ -288,13 +334,9 @@ public class SpectateAPI {
 
 			}
 
-			if (getPlugin().CommandExecutor.isSpectating.get(onlinePlayers.getName()) != null) {
+			if (getPlugin().CommandExecutor.isSpectating.contains(onlinePlayers.getName())) {
 
-				if (getPlugin().CommandExecutor.isSpectating.get(onlinePlayers.getName())) {
-
-					continue;
-
-				}
+				continue;
 
 			}
 
@@ -315,25 +357,25 @@ public class SpectateAPI {
 		return spectateablePlayers;
 
 	}
-	
+
 	public static void setMode(String player, String mode) {
-		
+
 		getPlugin().CommandExecutor.mode.put(player, mode);
-		
+
 	}
-	
+
 
 	public static void setPlugin(Spectate plugin) {
-		
+
 		SpectateAPI.plugin = plugin;
-		
+
 	}
-	
+
 
 	public static Spectate getPlugin() {
-		
+
 		return plugin;
-		
+
 	}
 
 }

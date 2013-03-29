@@ -14,17 +14,20 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 	public Spectate plugin;
 
-	public HashMap<String, Boolean> isSpectating = new HashMap<String, Boolean>();
-	public HashMap<String, Boolean> isBeingSpectated = new HashMap<String, Boolean>();
+	public ArrayList<String> isSpectating = new ArrayList<String>();
+	public ArrayList<String> isBeingSpectated = new ArrayList<String>();
 	public HashMap<String, String> spectator = new HashMap<String, String>();
 	public HashMap<String, String> target = new HashMap<String, String>();
 	public HashMap<String, ItemStack[]> senderInv = new HashMap<String, ItemStack[]>();
 	public HashMap<String, ItemStack[]> senderArm = new HashMap<String, ItemStack[]>();
 	public HashMap<String, Integer> senderHunger = new HashMap<String, Integer>();
 	public HashMap<String, Integer> senderHealth = new HashMap<String, Integer>();
+	public HashMap<String, Integer> senderSlot = new HashMap<String, Integer>();
 	public HashMap<String, Location> origLocation = new HashMap<String, Location>();
 	public HashMap<String, String> mode = new HashMap<String, String>();
 	public HashMap<String, Integer> playerNumber = new HashMap<String, Integer>();
+	
+	public HashMap<String, Integer> playerAngle = new HashMap<String, Integer>();
 
 	public HashMap<String, Boolean> isScanning = new HashMap<String, Boolean>();
 	public HashMap<String, Boolean> isInv = new HashMap<String, Boolean>();
@@ -32,6 +35,8 @@ public class SpectateCommandExecutor implements CommandExecutor {
 	public HashMap<String, Integer> taskId = new HashMap<String, Integer>();
 
 	public HashMap<String, Boolean> isClick = new HashMap<String, Boolean>();
+	
+	public ArrayList<String> isControlling = new ArrayList<String>();
 
 	public SpectateCommandExecutor(Spectate plugin) {
 
@@ -49,42 +54,38 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 		Player cmdsender = (Player) sender;
 
-		if (!cmdsender.hasPermission("spectate.use")) {
-
-			cmdsender.sendMessage("§cYou do not have permission to spectate.");
-			return true;
-
-		}
-
 		if (cmd.getName().equalsIgnoreCase("spectate") || cmd.getName().equalsIgnoreCase("spec")) {
 
 			if (args.length > 0) {
 
 				if (args[0].equalsIgnoreCase("off")) {
 
-					if (isSpectating.get(cmdsender.getName()) != null) {
+					if (!cmdsender.hasPermission("spectate.off")) {
 
-						if (isSpectating.get(cmdsender.getName())) {
+						cmdsender.sendMessage("§cYou do not have permission.");
+						return true;
 
-							cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
+					}
 
-							SpectateAPI.spectateOff(cmdsender);
+					if (isSpectating.contains(cmdsender.getName())) {
 
-							if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
+						cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
 
-								if (plugin.CommandExecutor.isScanning.get(cmdsender.getName())) {
+						SpectateAPI.spectateOff(cmdsender);
 
-									plugin.CommandExecutor.isScanning.put(cmdsender.getName(), false);
+						if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
 
-									plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(cmdsender.getName()));
+							if (plugin.CommandExecutor.isScanning.get(cmdsender.getName())) {
 
-								}
+								plugin.CommandExecutor.isScanning.put(cmdsender.getName(), false);
+
+								plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(cmdsender.getName()));
 
 							}
 
-							return true;
-
 						}
+
+						return true;
 
 					}
 
@@ -94,6 +95,13 @@ public class SpectateCommandExecutor implements CommandExecutor {
 				}
 
 				if (args[0].equalsIgnoreCase("mode")) {
+
+					if (!cmdsender.hasPermission("spectate.mode")) {
+
+						cmdsender.sendMessage("§cYou do not have permission.");
+						return true;
+
+					}
 
 					if (args.length < 2) {
 
@@ -146,6 +154,13 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				if (args[0].equalsIgnoreCase("scan")) {
 
+					if (!cmdsender.hasPermission("spectate.scan")) {
+
+						cmdsender.sendMessage("§cYou do not have permission.");
+						return true;
+
+					}
+
 					if (isScanning.get(cmdsender.getName()) != null) {
 
 						if (isScanning.get(cmdsender.getName())) {
@@ -192,7 +207,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					try {
 
-						if (isSpectating.get(cmdsender.getName()) == null || !isSpectating.get(cmdsender.getName())) {
+						if (!isSpectating.contains(cmdsender.getName())) {
 
 							SpectateAPI.spectateOn(cmdsender, specPlayers[0]);
 
@@ -211,16 +226,185 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				if (args[0].equalsIgnoreCase("inv")) {
+				if (args[0].equalsIgnoreCase("angle")) {
 
-					if (isSpectating.get(cmdsender.getName()) != null) {
+					if (!cmdsender.hasPermission("spectate.angle")) {
 
-						if (isSpectating.get(cmdsender.getName())) {
+						cmdsender.sendMessage("§cYou do not have permission.");
+						return true;
 
-							cmdsender.sendMessage("§cError: You can not change this setting while spectating.");
+					}
+					
+					if (playerAngle.get(cmdsender.getName()) == null) {
+						
+						playerAngle.put(cmdsender.getName(), 1);
+						
+					}
+
+					if (args.length == 2) {
+
+						if (args[1].equalsIgnoreCase("firstperson")) {
+
+							if (playerAngle.get(cmdsender.getName()) == 1) {
+
+								cmdsender.sendMessage("§cError: You are already in first person mode.");
+
+							}
+
+							playerAngle.put(cmdsender.getName(), 1);
+
+							if (isSpectating.contains(cmdsender.getName())) {
+
+								cmdsender.hidePlayer(plugin.getServer().getPlayer(target.get(cmdsender.getName())));
+
+							}
+
+							cmdsender.sendMessage(ChatColor.GRAY + "You are now in first person mode.");
+							return true;
+
+						}else if (args[1].equalsIgnoreCase("thirdperson")) {
+
+							if (playerAngle.get(cmdsender.getName()) == 2) {
+
+								cmdsender.sendMessage("§cError: You are already in third person mode.");
+
+							}
+
+							playerAngle.put(cmdsender.getName(), 2);
+							
+							if (isSpectating.contains(cmdsender.getName())) {
+
+								cmdsender.showPlayer(plugin.getServer().getPlayer(target.get(cmdsender.getName())));
+
+							}
+							
+							cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person mode.");
+							return true;
+
+						}else {
+
+							cmdsender.sendMessage(ChatColor.RED + "Error: Unknown angle.");
 							return true;
 
 						}
+						
+						/*
+						
+						else if (args[1].equalsIgnoreCase("thirdpersonfront")) {
+
+							if (playerAngle.get(cmdsender.getName()) == 3) {
+
+								cmdsender.sendMessage("§cError: You are already in third person front mode.");
+
+							}
+
+							playerAngle.put(cmdsender.getName(), 3);
+							
+							if (isSpectating.contains(cmdsender.getName())) {
+
+								cmdsender.showPlayer(plugin.getServer().getPlayer(target.get(cmdsender.getName())));
+
+							}
+							
+							cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person front mode.");
+							return true;
+
+						}
+						
+						*/
+
+					}else {
+						
+						if (playerAngle.get(cmdsender.getName()) == 1) {
+
+							playerAngle.put(cmdsender.getName(), 2);
+							
+							if (isSpectating.contains(cmdsender.getName())) {
+
+								cmdsender.showPlayer(plugin.getServer().getPlayer(target.get(cmdsender.getName())));
+
+							}
+							
+							cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person mode.");
+							return true;
+
+						}else if (playerAngle.get(cmdsender.getName()) == 2) {
+
+							playerAngle.put(cmdsender.getName(), 1);
+							
+							if (isSpectating.contains(cmdsender.getName())) {
+
+								cmdsender.hidePlayer(plugin.getServer().getPlayer(target.get(cmdsender.getName())));
+
+							}
+							
+							cmdsender.sendMessage(ChatColor.GRAY + "You are now in first person mode.");
+							return true;
+
+						}
+						
+						/*
+
+						if (playerAngle.get(cmdsender.getName()) == 1) {
+
+							playerAngle.put(cmdsender.getName(), 2);
+							
+							if (isSpectating.contains(cmdsender.getName())) {
+
+								cmdsender.showPlayer(plugin.getServer().getPlayer(target.get(cmdsender.getName())));
+
+							}
+							
+							cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person mode.");
+							return true;
+
+						}else if (playerAngle.get(cmdsender.getName()) == 2) {
+
+							playerAngle.put(cmdsender.getName(), 3);
+							
+							if (isSpectating.contains(cmdsender.getName())) {
+
+								cmdsender.showPlayer(plugin.getServer().getPlayer(target.get(cmdsender.getName())));
+
+							}
+							
+							cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person front mode.");
+							return true;
+
+						}else if (playerAngle.get(cmdsender.getName()) == 3) {
+
+							playerAngle.put(cmdsender.getName(), 1);
+							
+							if (isSpectating.contains(cmdsender.getName())) {
+
+								cmdsender.hidePlayer(plugin.getServer().getPlayer(target.get(cmdsender.getName())));
+
+							}
+							
+							cmdsender.sendMessage(ChatColor.GRAY + "You are now in first person mode.");
+							return true;
+
+						}
+						
+						*/
+
+					}
+
+				}
+
+				if (args[0].equalsIgnoreCase("inv")) {
+
+					if (!cmdsender.hasPermission("spectate.inv")) {
+
+						cmdsender.sendMessage("§cYou do not have permission.");
+						return true;
+
+					}
+
+					if (isSpectating.contains(cmdsender.getName())) {
+
+						cmdsender.sendMessage("§cError: You can not change this setting while spectating.");
+						return true;
 
 					}
 
@@ -272,6 +456,33 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
+				if (args[0].equalsIgnoreCase("help")) {
+
+					if (!cmdsender.hasPermission("spectate.help")) {
+
+						cmdsender.sendMessage("§cYou do not have permission.");
+						return true;
+
+					}
+
+					cmdsender.sendMessage(ChatColor.RED + "Commands for Spectate:");
+					cmdsender.sendMessage(ChatColor.RED + "/spectate [PlayerName]: " + ChatColor.GRAY + "Puts you into spectate mode and lets you see what the target sees.");
+					cmdsender.sendMessage(ChatColor.RED + "/spectate off : " + ChatColor.GRAY + "Takes you out of spectate mode.");
+					cmdsender.sendMessage(ChatColor.RED + "/spectate mode [1 | default]: " + ChatColor.GRAY + "Puts you into the default spectate mode.");
+					cmdsender.sendMessage(ChatColor.RED + "/spectate mode [2 | scroll]: " + ChatColor.GRAY + "Puts you into scroll style mode with left click and right click controls.");
+					cmdsender.sendMessage(ChatColor.RED + "/spectate inv [on/off] : " + ChatColor.GRAY + "Toggles whether or not your inventory will be modified while spectating.");
+					cmdsender.sendMessage(ChatColor.RED + "/spectate help : " + ChatColor.GRAY + "Shows this help page.");
+					return true;
+
+				}
+
+				if (!cmdsender.hasPermission("spectate.on")) {
+
+					cmdsender.sendMessage("§cYou do not have permission.");
+					return true;
+
+				}
+
 				Player targetPlayer = plugin.getServer().getPlayer(args[0]);
 
 				if (targetPlayer != null) {
@@ -283,29 +494,21 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					if (isSpectating.get(cmdsender.getName()) != null) {
+					if (isSpectating.contains(cmdsender.getName())) {
 
-						if (isSpectating.get(cmdsender.getName())) {
+						if (targetPlayer.getName().equals(target.get(cmdsender.getName()))) {
 
-							if (targetPlayer.getName().equals(target.get(cmdsender.getName()))) {
-
-								cmdsender.sendMessage("§7You are already spectating them.");
-								return true;
-
-							}
+							cmdsender.sendMessage("§7You are already spectating them.");
+							return true;
 
 						}
 
 					}
 
-					if (isSpectating.get(targetPlayer.getName()) != null) {
+					if (isSpectating.contains(targetPlayer.getName())) {
 
-						if (isSpectating.get(targetPlayer.getName())) {
-
-							cmdsender.sendMessage("§7They are currently spectating someone.");
-							return true;
-
-						}
+						cmdsender.sendMessage("§7They are currently spectating someone.");
+						return true;
 
 					}
 
@@ -344,35 +547,45 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}
 
-			if (isSpectating.get(cmdsender.getName()) != null) {
+			if (isSpectating.contains(cmdsender.getName())) {
 
-				if (isSpectating.get(cmdsender.getName())) {
+				if (!cmdsender.hasPermission("spectate.off")) {
 
-					cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
-
-					SpectateAPI.spectateOff(cmdsender);
-
-					if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
-
-						if (plugin.CommandExecutor.isScanning.get(cmdsender.getName())) {
-
-							plugin.CommandExecutor.isScanning.put(cmdsender.getName(), false);
-
-							plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(cmdsender.getName()));
-
-						}
-
-					}
-
+					cmdsender.sendMessage("§cYou do not have permission.");
 					return true;
 
 				}
+
+				cmdsender.sendMessage("§7You have stopped spectating " + target.get(cmdsender.getName()) + ".");
+
+				SpectateAPI.spectateOff(cmdsender);
+
+				if (plugin.CommandExecutor.isScanning.get(cmdsender.getName()) != null) {
+
+					if (plugin.CommandExecutor.isScanning.get(cmdsender.getName())) {
+
+						plugin.CommandExecutor.isScanning.put(cmdsender.getName(), false);
+
+						plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(cmdsender.getName()));
+
+					}
+
+				}
+
+				return true;
 
 			}
 
 			if (plugin.CommandExecutor.mode.get(cmdsender.getName()) != null) {
 
 				if (plugin.CommandExecutor.mode.get(cmdsender.getName()).equals("2")) {
+
+					if (!cmdsender.hasPermission("spectate.on")) {
+
+						cmdsender.sendMessage("§cYou do not have permission.");
+						return true;
+
+					}
 
 					ArrayList<Player> spectateablePlayers = SpectateAPI.getSpectateablePlayers();
 
@@ -382,18 +595,14 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					try {
 
-						if (isSpectating.get(cmdsender.getName()) != null) {
+						if (isSpectating.contains(cmdsender.getName())) {
 
-							if (isSpectating.get(cmdsender.getName())) {
+							if (target.get(cmdsender.getName()) != null) {
 
-								if (target.get(cmdsender.getName()) != null) {
+								if (players[0].getName().equals(target.get(cmdsender.getName()))) {
 
-									if (players[0].getName().equals(target.get(cmdsender.getName()))) {
-
-										cmdsender.sendMessage("§cError: You are already spectating this player.");
-										return true;
-
-									}
+									cmdsender.sendMessage("§cError: You are already spectating this player.");
+									return true;
 
 								}
 
@@ -416,9 +625,137 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}
 
-			cmdsender.sendMessage("§cError: No player target§f");
+			if (!cmdsender.hasPermission("spectate.help")) {
+
+				cmdsender.sendMessage("§cYou do not have permission.");
+				return true;
+
+			}
+
+			cmdsender.sendMessage(ChatColor.RED + "Commands for Spectate:");
+			cmdsender.sendMessage(ChatColor.RED + "/spectate [PlayerName]: " + ChatColor.GRAY + "Puts you into spectate mode and lets you see what the target sees.");
+			cmdsender.sendMessage(ChatColor.RED + "/spectate off : " + ChatColor.GRAY + "Takes you out of spectate mode.");
+			cmdsender.sendMessage(ChatColor.RED + "/spectate mode [1 | default]: " + ChatColor.GRAY + "Puts you into the default spectate mode.");
+			cmdsender.sendMessage(ChatColor.RED + "/spectate mode [2 | scroll]: " + ChatColor.GRAY + "Puts you into scroll style mode with left click and right click controls.");
+			cmdsender.sendMessage(ChatColor.RED + "/spectate inv [on/off] : " + ChatColor.GRAY + "Toggles whether or not your inventory will be modified while spectating.");
+			cmdsender.sendMessage(ChatColor.RED + "/spectate help : " + ChatColor.GRAY + "Shows this help page.");
+
 			return true;
 
+		}
+		
+		if (cmd.getName().equalsIgnoreCase("control")) {
+			
+			if (!cmdsender.hasPermission("spectate.control")) {
+
+				cmdsender.sendMessage("§cYou do not have permission.");
+				return true;
+
+			}
+			
+			if (args.length > 0) {
+				
+				if (args[0].equalsIgnoreCase("off")) {
+
+					if (!cmdsender.hasPermission("spectate.off")) {
+
+						cmdsender.sendMessage("§cYou do not have permission.");
+						return true;
+
+					}
+
+					if (isControlling.contains(cmdsender.getName())) {
+
+						cmdsender.sendMessage("§7You have stopped controlling " + spectator.get(cmdsender.getName()) + ".");
+						SpectateAPI.spectateOff(plugin.getServer().getPlayer(spectator.get(cmdsender.getName())));
+						return true;
+
+					}
+
+					cmdsender.sendMessage("§7You are not currently controlling anyone.");
+					return true;
+
+				}
+				
+				Player targetPlayer = plugin.getServer().getPlayer(args[0]);
+
+				if (targetPlayer != null) {
+
+					if (cmdsender.getName() == targetPlayer.getName()) {
+
+						cmdsender.sendMessage("§7Did you really just try to control yourself?");
+						return true;
+
+					}
+
+					if (isControlling.contains(cmdsender.getName())) {
+
+						if (targetPlayer.getName().equals(target.get(targetPlayer.getName()))) {
+
+							cmdsender.sendMessage("§7You are already controlling them.");
+							return true;
+
+						}
+
+					}
+
+					if (isSpectating.contains(targetPlayer.getName())) {
+						
+						if (isControlling.contains(target.get(targetPlayer.getName()))) {
+							
+							cmdsender.sendMessage("§7They are currently being controlled by someone.");
+							return true;
+							
+						}
+
+						cmdsender.sendMessage("§7They are currently spectating someone.");
+						return true;
+
+					}
+					
+					if (isControlling.contains(targetPlayer.getName())) {
+						
+						cmdsender.sendMessage("§7They are currently controlling someone.");
+						return true;
+						
+					}
+
+					if (targetPlayer.isDead()) {
+
+						cmdsender.sendMessage("§7They are currently dead.");
+						return true;
+
+					}
+
+					if (plugin.conf.getBoolean("canspectate Permission Enabled?") == true) {
+
+						if (targetPlayer.hasPermission("spectate.cantspectate")) {
+
+							cmdsender.sendMessage("§7They can not be controlled.");
+							return true;
+
+						}
+
+					}
+					
+					isControlling.add(targetPlayer.getName());
+					SpectateAPI.spectateOn(targetPlayer, cmdsender);
+					return true;
+
+				}
+
+				if (args[0].equalsIgnoreCase("herobrine")) {
+
+					cmdsender.sendMessage("§7You can't control Herobrine silly.");
+					return true;
+
+				}
+
+				cmdsender.sendMessage("§cError: Player is not online§f");
+				return true;
+				
+			}
+			
 		}
 
 		return true;
