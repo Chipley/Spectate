@@ -22,6 +22,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 	public HashMap<String, ItemStack[]> senderArm = new HashMap<String, ItemStack[]>();
 	public HashMap<String, Integer> senderHunger = new HashMap<String, Integer>();
 	public HashMap<String, Integer> senderHealth = new HashMap<String, Integer>();
+	public HashMap<String, Integer> senderXP = new HashMap<String, Integer>();
 	public HashMap<String, Integer> senderSlot = new HashMap<String, Integer>();
 	public HashMap<String, Location> origLocation = new HashMap<String, Location>();
 	public HashMap<String, String> mode = new HashMap<String, String>();

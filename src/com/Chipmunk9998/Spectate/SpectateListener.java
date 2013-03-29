@@ -3,8 +3,6 @@ package com.Chipmunk9998.Spectate;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import net.minecraft.server.v1_5_R2.Packet16BlockItemSwitch;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Monster;
@@ -97,8 +95,11 @@ public class SpectateListener implements Listener {
 
 						p.setFoodLevel(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getFoodLevel());
 						
-						((CraftPlayer)p).getHandle().inventory.itemInHandIndex = plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getHeldItemSlot();
-						((CraftPlayer)p).getHandle().playerConnection.sendPacket(new Packet16BlockItemSwitch(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getHeldItemSlot()));
+						p.setLevel(0);
+						p.setExp(0);
+						p.setTotalExperience(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getTotalExperience());
+						
+						p.getInventory().setHeldItemSlot(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getHeldItemSlot());
 
 					}
 
@@ -739,6 +740,12 @@ public class SpectateListener implements Listener {
 			return d;
 
 		}
+
+	}
+
+	public void setExperienceCooldown(Player player, int cooldown) {
+
+		((CraftPlayer)player).getHandle().bT = cooldown;
 
 	}
 

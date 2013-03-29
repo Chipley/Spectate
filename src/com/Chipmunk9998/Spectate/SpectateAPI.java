@@ -2,9 +2,6 @@ package com.Chipmunk9998.Spectate;
 
 import java.util.ArrayList;
 
-import net.minecraft.server.v1_5_R2.Packet16BlockItemSwitch;
-
-import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 public class SpectateAPI {
@@ -66,11 +63,16 @@ public class SpectateAPI {
 			player.getInventory().setArmorContents(target.getInventory().getArmorContents());
 
 		}
+		
+		getPlugin().CommandExecutor.senderXP.put(player.getName(), player.getTotalExperience());
+		plugin.Listener.setExperienceCooldown(player, Integer.MAX_VALUE);
+		player.setLevel(0);
+		player.setExp(0);
+		player.setTotalExperience(target.getTotalExperience());
 
 		getPlugin().CommandExecutor.senderSlot.put(player.getName(), player.getInventory().getHeldItemSlot());
-
-		((CraftPlayer)player).getHandle().inventory.itemInHandIndex = target.getInventory().getHeldItemSlot();
-		((CraftPlayer)player).getHandle().playerConnection.sendPacket(new Packet16BlockItemSwitch(target.getInventory().getHeldItemSlot()));
+		
+		player.getInventory().setHeldItemSlot(target.getInventory().getHeldItemSlot());
 
 		ArrayList<Player> spectateablePlayers = getSpectateablePlayers();
 
@@ -137,11 +139,16 @@ public class SpectateAPI {
 
 		player.setHealth(getPlugin().CommandExecutor.senderHealth.get(player.getName()));
 		player.setFoodLevel(getPlugin().CommandExecutor.senderHunger.get(player.getName()));
+		
+		player.setLevel(0);
+		player.setExp(0);
+		player.setTotalExperience(getPlugin().CommandExecutor.senderXP.get(player.getName()));
 
 		player.setFireTicks(0);
-
-		((CraftPlayer)player).getHandle().inventory.itemInHandIndex = getPlugin().CommandExecutor.senderSlot.get(player.getName());
-		((CraftPlayer)player).getHandle().playerConnection.sendPacket(new Packet16BlockItemSwitch(getPlugin().CommandExecutor.senderSlot.get(player.getName())));
+		
+		player.getInventory().setHeldItemSlot(getPlugin().CommandExecutor.senderSlot.get(player.getName()));
+		
+		plugin.Listener.setExperienceCooldown(player, 0);
 
 		String[] spectators = getPlugin().CommandExecutor.spectator.get(getPlugin().CommandExecutor.target.get(player.getName())).split(",");
 
@@ -187,6 +194,8 @@ public class SpectateAPI {
 		getPlugin().CommandExecutor.senderHealth.remove(player.getName());
 		getPlugin().CommandExecutor.senderHunger.remove(player.getName());
 		getPlugin().CommandExecutor.target.remove(player.getName());
+		getPlugin().CommandExecutor.senderSlot.remove(player.getName());
+		getPlugin().CommandExecutor.senderXP.remove(player.getName());
 
 	}
 
