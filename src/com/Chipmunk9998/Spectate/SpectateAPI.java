@@ -349,7 +349,7 @@ public class SpectateAPI {
 
 			}
 
-			if (getPlugin().conf.getBoolean("canspectate Permission Enabled?")) {
+			if (getPlugin().conf.getBoolean("cantspectate Permission Enabled?")) {
 
 				if (onlinePlayers.hasPermission("spectate.cantspectate")) {
 

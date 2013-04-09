@@ -520,7 +520,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					if (plugin.conf.getBoolean("canspectate Permission Enabled?") == true) {
+					if (plugin.conf.getBoolean("cantspectate Permission Enabled?") == true) {
 
 						if (targetPlayer.hasPermission("spectate.cantspectate")) {
 
@@ -728,7 +728,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 					}
 
-					if (plugin.conf.getBoolean("canspectate Permission Enabled?") == true) {
+					if (plugin.conf.getBoolean("cantspectate Permission Enabled?") == true) {
 
 						if (targetPlayer.hasPermission("spectate.cantspectate")) {
 

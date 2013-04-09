@@ -19,10 +19,19 @@ public class Spectate extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(Listener, this);
 
 		conf = getConfig();
+		
+		boolean canspectate = false;
+		
+		if (conf.get("canspectate Permission Enabled?") != null) {
+			
+			canspectate = conf.getBoolean("canspectate Permission Enabled?");
+			conf.set("canspectate Permission Enabled?", null);
 
-		if (conf.get("canspectate Permission Enabled?") == null) {
+		}
 
-			conf.set("canspectate Permission Enabled?", false);
+		if (conf.get("cantspectate Permission Enabled?") == null) {
+
+			conf.set("cantspectate Permission Enabled?", canspectate);
 
 		}
 
