@@ -1,88 +1,41 @@
 package com.Chipmunk9998.Spectate;
 
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.Chipmunk9998.Spectate.api.SpectateManager;
+
 public class Spectate extends JavaPlugin {
-
-	FileConfiguration conf;
-
-	public SpectateListener Listener = new SpectateListener(this);
-	public SpectateCommandExecutor CommandExecutor = new SpectateCommandExecutor(this);
-
+	
+	//TODO: Scanning
+	//TODO: First person/Third person/Third person front/Free roam
+	//TODO: Control command
+	//TODO: Fix inventory compatibility (Multiverse Inventories, Mob Arena)
+	//TODO: Fix players that log in being able to see spectating players (just check in join event)
+	//TODO: Config
+	
 	public void onEnable() {
-
-		SpectateAPI.setPlugin(this);
-
-		getServer().getPluginManager().registerEvents(Listener, this);
-
-		conf = getConfig();
 		
-		boolean canspectate = false;
+		SpectateManager.setPlugin(this);
 		
-		if (conf.get("canspectate Permission Enabled?") != null) {
-			
-			canspectate = conf.getBoolean("canspectate Permission Enabled?");
-			conf.set("canspectate Permission Enabled?", null);
-
-		}
-
-		if (conf.get("cantspectate Permission Enabled?") == null) {
-
-			conf.set("cantspectate Permission Enabled?", canspectate);
-
-		}
-
-		if (conf.get("Disable commands while spectating?") == null) {
-
-			conf.set("Disable commands while spectating?", false);
-
-		}
-
-		saveConfig();
-
-		PluginDescriptionFile pdfFile = getDescription();
-
-		System.out.println("[" + pdfFile.getName() + "] " + pdfFile.getName() + " v" + pdfFile.getVersion() + " enabled!");
-
-		Listener.updatePlayer();
-
-		getCommand("spectate").setExecutor(CommandExecutor);
-		getCommand("spec").setExecutor(CommandExecutor);
-		//getCommand("control").setExecutor(CommandExecutor);
-
+		getServer().getPluginManager().registerEvents(new SpectateListener(this), this);
+		getCommand("spectate").setExecutor(new SpectateCommandExecutor(this));
+		SpectateManager.startSpectateTask();
+		
 	}
-
+	
 	public void onDisable() {
-
-		for (Player players : getServer().getOnlinePlayers()) {
-
-			if (CommandExecutor.isSpectating.contains(players.getName())) {
-
-				players.sendMessage("§7You were forced to stop spectating because of a server reload.");
-
-				if (CommandExecutor.isScanning.get(players.getName()) != null) {
-
-					if (CommandExecutor.isScanning.get(players.getName())) {
-
-						CommandExecutor.isScanning.put(players.getName(), false);
-
-						getServer().getScheduler().cancelTask(CommandExecutor.taskId.get(players.getName()));
-
-					}
-
-				}
-
-				SpectateAPI.spectateOff(players);
-
-			}
-
+		
+		for (Player p : SpectateManager.getSpectatingPlayers()) {
+			
+			SpectateManager.stopSpectating(p, true);
+			p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because of a server reload.");
+			
 		}
-
-		System.out.println("Spectate is disabled!");
-
+		
+		SpectateManager.stopSpectateTask();
+		
 	}
 
 }

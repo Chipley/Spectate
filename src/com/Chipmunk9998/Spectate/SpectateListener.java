@@ -1,13 +1,10 @@
 package com.Chipmunk9998.Spectate;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -15,30 +12,25 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.util.Vector;
 
-import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
+import com.Chipmunk9998.Spectate.api.ScrollDirection;
+import com.Chipmunk9998.Spectate.api.SpectateManager;
+import com.Chipmunk9998.Spectate.api.SpectateScrollEvent;
 
 public class SpectateListener implements Listener {
 
-	public Spectate plugin;
+	Spectate plugin;
 
 	public SpectateListener(Spectate plugin) {
 
@@ -46,209 +38,249 @@ public class SpectateListener implements Listener {
 
 	}
 
-	public void updatePlayer() {
-
-		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-			public void run() {
-
-				for (Player p : plugin.getServer().getOnlinePlayers()) {
-
-					if (plugin.CommandExecutor.isSpectating.contains(p.getName())) {
-
-						if (roundTwoDecimals(p.getLocation().getX()) != roundTwoDecimals(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getX()) || roundTwoDecimals(p.getLocation().getY()) != roundTwoDecimals(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getY()) || roundTwoDecimals(p.getLocation().getZ()) != roundTwoDecimals(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getZ()) || roundTwoDecimals(p.getLocation().getYaw()) != roundTwoDecimals(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getYaw()) || roundTwoDecimals(p.getLocation().getPitch()) != roundTwoDecimals(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getPitch())) {
-
-							if (plugin.CommandExecutor.playerAngle.get(p.getName()) == 2 || plugin.CommandExecutor.playerAngle.get(p.getName()) == 3) {
-
-								p.teleport(getThirdPersonLocation(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())), (plugin.CommandExecutor.playerAngle.get(p.getName()) == 2 ? false : true)));
-
-							}else {
-
-								Location loc = new Location(p.getLocation().getWorld(), plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getX(), plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getY(), plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getZ());
-
-								loc.setYaw(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getYaw());
-
-								loc.setPitch(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getLocation().getPitch());
-
-								p.teleport(loc);
-
-							}
-
-						}
-
-						if (plugin.CommandExecutor.isInv.get(p.getName()) == null || plugin.CommandExecutor.isInv.get(p.getName())) {
-
-							p.getInventory().setContents(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getContents());
-							p.getInventory().setArmorContents(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getArmorContents());
-
-						}
-
-						if (plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getHealth() > 0) {
-
-							p.setHealth(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getHealth());
-
-						}else {
-
-							p.setHealth(1);
-
-						}
-
-						p.setFoodLevel(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getFoodLevel());
-						
-						p.setLevel(0);
-						p.setExp(0);
-						p.setTotalExperience(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getTotalExperience());
-						
-						p.getInventory().setHeldItemSlot(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())).getInventory().getHeldItemSlot());
-
-					}
-
-				}
-
-			}
-
-		}, 0L, 1L);
-
-	}
-
-	@EventHandler
-	public void onPlayerMove(PlayerMoveEvent event) {
-
-		/*
-
-		if (plugin.CommandExecutor.isBeingSpectated.contains(event.getPlayer().getName())) {
-
-			String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer().getName()).split(",");
-
-			for (String player : spectators) {
-
-				Player p = plugin.getServer().getPlayer(player);
-
-				if (plugin.CommandExecutor.angleIsThird.contains(p.getName())) {
-
-					p.teleport(getThirdPersonLocation(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName()))));
-
-				}else {
-
-					p.teleport(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(p.getName())));
-
-				}
-
-			}
-
-		}
-
-		 */
-
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
-
-			if (plugin.CommandExecutor.playerAngle.get(event.getPlayer().getName()) == 2 || plugin.CommandExecutor.playerAngle.get(event.getPlayer().getName()) == 3) {
-
-				event.setTo(getThirdPersonLocation(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(event.getPlayer().getName())), (plugin.CommandExecutor.playerAngle.get(event.getPlayer().getName()) == 2 ? false : true)));
-
-			}else {
-
-				event.getPlayer().teleport(plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(event.getPlayer().getName())));
-
-			}
-
-		}
-
-	}
-
-
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
+		if (SpectateManager.isSpectating(event.getPlayer())) {
 
-			SpectateAPI.spectateOff(event.getPlayer());
+			SpectateManager.stopSpectating(event.getPlayer(), true);
+			return;
 
-			if (plugin.CommandExecutor.isScanning.get(event.getPlayer().getName()) != null) {
+		}else if (SpectateManager.isBeingSpectated(event.getPlayer())) {
 
-				if (plugin.CommandExecutor.isScanning.get(event.getPlayer().getName())) {
+			for (Player p : SpectateManager.getSpectators(event.getPlayer())) {
 
-					plugin.CommandExecutor.isScanning.put(event.getPlayer().getName(), false);
+				if (SpectateManager.getSpectateMode(event.getPlayer()) == 2) {
+					
+					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, SpectateManager.getSpectateablePlayers(), ScrollDirection.LEFT);
+					plugin.getServer().getPluginManager().callEvent(event);
+					
+					ArrayList<Player> playerList = scrollEvent.getSpectateList();
+					
+					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has disconnected.");
+					
+					if (!SpectateManager.scrollRight(event.getPlayer(), playerList)) {
+						
+						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
+						
+					}
 
-					plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(event.getPlayer().getName()));
+				}else {
+
+					SpectateManager.stopSpectating(p, true);
+					p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because the person you were spectating disconnected.");
 
 				}
+
+			}
+
+			return;
+
+		}
+
+	}
+	
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		
+		if (SpectateManager.isBeingSpectated(event.getEntity())) {
+
+			for (Player p : SpectateManager.getSpectators(event.getEntity())) {
+
+				if (SpectateManager.getSpectateMode(event.getEntity()) == 2) {
+					
+					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, SpectateManager.getSpectateablePlayers(), ScrollDirection.LEFT);
+					plugin.getServer().getPluginManager().callEvent(event);
+					
+					ArrayList<Player> playerList = scrollEvent.getSpectateList();
+					
+					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has died.");
+					
+					if (!SpectateManager.scrollRight(event.getEntity(), playerList)) {
+						
+						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
+						
+					}
+
+				}else {
+
+					SpectateManager.stopSpectating(p, true);
+					p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because the person you were spectating died.");
+
+				}
+
+			}
+
+			return;
+
+		}
+		
+	}
+	
+	@EventHandler
+	public void onPlayerDamage(EntityDamageEvent event) {
+		
+		if (event instanceof EntityDamageByEntityEvent) {
+			
+			EntityDamageByEntityEvent event1 = (EntityDamageByEntityEvent) event;
+			
+			if (event1.getDamager() instanceof Player) {
+				
+				if (SpectateManager.isSpectating((Player)event1.getDamager())) {
+					
+					event.setCancelled(true);
+					return;
+					
+				}
+				
+			}
+			
+		}
+		
+		if (!(event.getEntity() instanceof Player)) {
+			
+			return;
+			
+		}
+		
+		Player p = (Player) event.getEntity();
+		
+		if (SpectateManager.isSpectating(p)) {
+			
+			event.setCancelled(true);
+			return;
+			
+		}
+		
+	}
+
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent event) {
+
+		if (SpectateManager.isSpectating(event.getPlayer())) {
+
+			if (!SpectateManager.isClick.contains(event.getPlayer().getName())) {
+
+				if (SpectateManager.getSpectateMode(event.getPlayer()) == 2) {
+
+					if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+
+						if (plugin.getServer().getOnlinePlayers().length > 2) {
+
+							SpectateManager.scrollLeft(event.getPlayer(), SpectateManager.getSpectateablePlayers());
+							SpectateManager.clickEnable(event.getPlayer());
+
+						}
+
+					}else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+
+						if (plugin.getServer().getOnlinePlayers().length > 2) {
+
+							SpectateManager.scrollRight(event.getPlayer(), SpectateManager.getSpectateablePlayers());
+							SpectateManager.clickEnable(event.getPlayer());
+
+						}
+
+					}
+
+				}
+
+			}
+
+			event.setCancelled(true);
+			return;
+
+		}
+
+	}
+
+	@EventHandler
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+
+		if (SpectateManager.isSpectating(event.getPlayer())) {
+
+			if (!SpectateManager.isClick.contains(event.getPlayer().getName())) {
+
+				if (SpectateManager.getSpectateMode(event.getPlayer()) == 2) {
+
+					if (plugin.getServer().getOnlinePlayers().length > 2) {
+
+						SpectateManager.scrollRight(event.getPlayer(), SpectateManager.getSpectateablePlayers());
+						SpectateManager.clickEnable(event.getPlayer());
+
+					}
+
+				}
+
+			}
+
+			event.setCancelled(true);
+			return;
+
+		}
+
+	}
+
+	@EventHandler
+	public void onInventoryOpen(InventoryOpenEvent event) {
+
+		if (!(event.getPlayer() instanceof Player)) {
+
+			return;
+
+		}
+
+		Player p = (Player) event.getPlayer();
+
+		if (SpectateManager.isBeingSpectated(p)) {
+
+			for (Player spectators : SpectateManager.getSpectators(p)) {
+
+				spectators.openInventory(event.getInventory());
 
 			}
 
 		}
 
-		if (plugin.CommandExecutor.isBeingSpectated.contains(event.getPlayer().getName())) {
+	}
 
-			String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer().getName()).split(",");
+	@EventHandler
+	public void onInventoryClose(InventoryCloseEvent event) {
 
-			for (String player : spectators) {
+		if (!(event.getPlayer() instanceof Player)) {
 
-				Player p = plugin.getServer().getPlayer(player);
+			return;
 
-				if ((plugin.CommandExecutor.mode.get(p.getName()) != null && plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null && plugin.CommandExecutor.isScanning.get(p.getName()))) {
+		}
 
-					ArrayList<Player> spectateablePlayers = SpectateAPI.getSpectateablePlayers();
+		Player p = (Player) event.getPlayer();
 
-					spectateablePlayers.remove(event.getPlayer());
+		if (SpectateManager.isBeingSpectated(p)) {
 
-					Player[] players = spectateablePlayers.toArray(new Player[spectateablePlayers.size()]);
+			for (Player spectators : SpectateManager.getSpectators(p)) {
 
-					try {
-
-						if (plugin.CommandExecutor.playerNumber.get(p.getName()) > players.length - 1) {
-
-							SpectateAPI.spectateOn(p, players[0]);
-							p.sendMessage("§7The person you were previously spectating has disconnected.");
-
-						}else {
-
-							SpectateAPI.spectateOn(p, players[plugin.CommandExecutor.playerNumber.get(p.getName())]);
-							p.sendMessage("§7The person you were previously spectating has disconnected.");
-
-						}
-
-					}catch (ArrayIndexOutOfBoundsException e) {
-
-						p.sendMessage("§7You were forced to stop spectating because there is nobody left to spectate.");
-						SpectateAPI.spectateOff(p);
-
-						if (plugin.CommandExecutor.isScanning.get(p.getName()) != null) {
-
-							if (plugin.CommandExecutor.isScanning.get(p.getName())) {
-
-								plugin.CommandExecutor.isScanning.put(p.getName(), false);
-
-								plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(p.getName()));
-
-							}
-
-						}
-
-						return;
-
-					}
-
-					return;
-
-				}
-
-				p.sendMessage("§7You were forced to stop spectating because the person you were spectating disconnected.");
-				SpectateAPI.spectateOff(p);
-
-				if (plugin.CommandExecutor.isScanning.get(p.getName()) != null) {
-
-					if (plugin.CommandExecutor.isScanning.get(p.getName())) {
-
-						plugin.CommandExecutor.isScanning.put(p.getName(), false);
-
-						plugin.getServer().getScheduler().cancelTask(plugin.CommandExecutor.taskId.get(p.getName()));
-
-					}
-
-				}
+				spectators.closeInventory();
 
 			}
+
+		}
+
+	}
+
+	@EventHandler
+	public void onInventoryClick(InventoryClickEvent event) {
+
+		if (!(event.getWhoClicked() instanceof Player)) {
+
+			return;
+
+		}
+
+		Player p = (Player) event.getWhoClicked();
+
+		if (SpectateManager.isSpectating(p)) {
+
+			event.setCancelled(true);
 
 		}
 
@@ -257,29 +289,7 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
-
-			event.setCancelled(true);
-
-		}
-
-	}
-
-	@EventHandler
-	public void onPlayerDropItem(PlayerDropItemEvent event) {
-
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
-
-			event.setCancelled(true);
-
-		}
-
-	}
-
-	@EventHandler
-	public void onBlockPlace(BlockPlaceEvent event) {
-
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
+		if (SpectateManager.isSpectating(event.getPlayer())) {
 
 			event.setCancelled(true);
 
@@ -290,7 +300,7 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
+		if (SpectateManager.isSpectating(event.getPlayer())) {
 
 			event.setCancelled(true);
 
@@ -299,260 +309,9 @@ public class SpectateListener implements Listener {
 	}
 
 	@EventHandler
-	public void onEntityDamage(EntityDamageEvent event) {
+	public void onBlockPlace(BlockPlaceEvent event) {
 
-		if (event.getEntity() instanceof Player) {
-
-			Player p = (Player) event.getEntity();
-
-			if (plugin.CommandExecutor.isSpectating.contains(p.getName())) {
-
-				event.setCancelled(true);
-				return;
-
-			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-
-		if (event.getEntity() instanceof Player) {
-
-			Player target = (Player)event.getEntity();
-
-			if (plugin.CommandExecutor.isSpectating.contains(target.getName())) {
-
-				if (event.getDamager() instanceof Projectile) {
-
-					EntityDamageByEntityEvent bowDamage = new EntityDamageByEntityEvent(event.getDamager(), plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())), event.getCause(), event.getDamage());
-
-					plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())).setLastDamageCause(bowDamage);
-
-					plugin.getServer().getPlayer(plugin.CommandExecutor.target.get(target.getName())).damage(event.getDamage());
-
-					event.getDamager().remove();
-
-				}
-
-				event.setCancelled(true);
-
-				return;
-
-			}
-
-		}
-
-		if (event.getDamager() instanceof Player) {
-
-			Player damager = (Player)event.getDamager();
-
-			if (plugin.CommandExecutor.isSpectating.contains(damager.getName())) {
-
-				event.setCancelled(true);
-
-			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void projectileShootEvent(ProjectileLaunchEvent event) {
-
-		if(event.getEntity().getShooter() instanceof Player) {
-
-			Projectile projectile = event.getEntity();
-
-			Player player = (Player)event.getEntity().getShooter();
-
-			if (plugin.CommandExecutor.isBeingSpectated.contains(player.getName())) {
-
-				Location loc = player.getLocation();
-
-				Vector dir = loc.getDirection();
-
-				dir.normalize();
-
-				loc.add(dir.multiply(1));
-
-				loc.setY(loc.getY() + 1.4);
-
-				projectile.teleport(loc);
-
-			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void onEntityDeath(EntityDeathEvent event) {
-
-		if (event instanceof PlayerDeathEvent) {
-
-			Player pla = (Player)event.getEntity();
-
-			if (plugin.CommandExecutor.isBeingSpectated.contains(pla.getName())) {
-
-				String[] spectators = plugin.CommandExecutor.spectator.get(pla.getName()).split(",");
-
-				for (String player : spectators) {
-
-					Player p = plugin.getServer().getPlayer(player);
-
-					if ((plugin.CommandExecutor.mode.get(p.getName()) != null && plugin.CommandExecutor.mode.get(p.getName()).equals("2")) || (plugin.CommandExecutor.isScanning.get(p.getName()) != null && plugin.CommandExecutor.isScanning.get(p.getName()))) {
-
-						ArrayList<Player> spectateablePlayers = SpectateAPI.getSpectateablePlayers();
-
-						spectateablePlayers.remove(p);
-
-						Player[] players = spectateablePlayers.toArray(new Player[spectateablePlayers.size()]);
-
-						try {
-
-							if (plugin.CommandExecutor.playerNumber.get(p.getName()) > players.length - 1) {
-
-								SpectateAPI.spectateOn(p, players[0]);
-
-							}else {
-
-								SpectateAPI.spectateOn(p, players[plugin.CommandExecutor.playerNumber.get(p.getName())]);
-
-							}
-
-							p.sendMessage("§7The person you were previously spectating has died.");
-
-						}catch (ArrayIndexOutOfBoundsException e) {
-
-							p.sendMessage("§7You were forced to stop spectating because there is nobody left to spectate.");
-							SpectateAPI.spectateOff(p);
-							e.printStackTrace();
-
-						}
-
-						return;
-
-					}
-
-					p.sendMessage("§7You were forced to stop spectating because the person you were spectating died.");
-
-					SpectateAPI.spectateOff(p);
-
-				}
-
-			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void onPlayerAnimation(PlayerAnimationEvent event) {
-
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
-
-			if (plugin.CommandExecutor.mode.get(event.getPlayer().getName()) != null) {
-
-				if (plugin.CommandExecutor.mode.get(event.getPlayer().getName()).equals("2")) {
-
-					if (event.getAnimationType().equals(PlayerAnimationType.ARM_SWING)) {
-
-						if (plugin.getServer().getOnlinePlayers().length > 2) {
-
-							if (plugin.CommandExecutor.isClick.get(event.getPlayer().getName()) != null) {
-
-								if (plugin.CommandExecutor.isClick.get(event.getPlayer().getName())) {
-
-									return;
-
-								}
-
-							}
-
-							SpectateAPI.scrollLeft(event.getPlayer());
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
-
-			event.setCancelled(true);
-
-			if (plugin.CommandExecutor.mode.get(event.getPlayer().getName()) != null) {
-
-				if (plugin.CommandExecutor.mode.get(event.getPlayer().getName()).equals("2")) {
-
-					if (plugin.getServer().getOnlinePlayers().length > 2) {
-
-						if (plugin.CommandExecutor.isClick.get(event.getPlayer().getName()) != null) {
-
-							if (plugin.CommandExecutor.isClick.get(event.getPlayer().getName())) {
-
-								return;
-
-							}
-
-						}
-
-						SpectateAPI.scrollRight(event.getPlayer());
-
-					}
-
-				}
-
-			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) {
-
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
-
-			if (plugin.CommandExecutor.mode.get(event.getPlayer().getName()) != null) {
-
-				if (plugin.CommandExecutor.mode.get(event.getPlayer().getName()).equals("2")) {
-
-					if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
-
-						if (plugin.getServer().getOnlinePlayers().length > 2) {
-
-							if (plugin.CommandExecutor.isClick.get(event.getPlayer().getName()) != null) {
-
-								if (plugin.CommandExecutor.isClick.get(event.getPlayer().getName())) {
-
-									return;
-
-								}
-
-							}
-
-							SpectateAPI.scrollRight(event.getPlayer());
-
-						}
-
-					}
-
-				}
-
-			}
+		if (SpectateManager.isSpectating(event.getPlayer())) {
 
 			event.setCancelled(true);
 
@@ -567,60 +326,11 @@ public class SpectateListener implements Listener {
 
 			Player p = (Player) event.getEntity();
 
-			if (plugin.CommandExecutor.isSpectating.contains(p.getName())) {
+			if (SpectateManager.isSpectating(p)) {
 
 				event.setCancelled(true);
 
 			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void onInventoryOpen(InventoryOpenEvent event) {
-
-		if (plugin.CommandExecutor.isBeingSpectated.contains(event.getPlayer().getName())) {
-
-			String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer().getName()).split(",");
-
-			for (String player : spectators) {
-
-				Player p = plugin.getServer().getPlayer(player);
-
-				p.openInventory(event.getInventory());
-
-			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent event) {
-
-		if (plugin.CommandExecutor.isBeingSpectated.contains(event.getPlayer().getName())) {
-
-			String[] spectators = plugin.CommandExecutor.spectator.get(event.getPlayer().getName()).split(",");
-
-			for (String player : spectators) {
-
-				Player p = plugin.getServer().getPlayer(player);
-
-				p.closeInventory();
-
-			}
-
-		}
-
-	}
-
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent event) {
-
-		if (plugin.CommandExecutor.isSpectating.contains(event.getWhoClicked().getName())) {
-
-			event.setCancelled(true);
 
 		}
 
@@ -633,7 +343,7 @@ public class SpectateListener implements Listener {
 
 			if (event.getTarget() instanceof Player) {
 
-				if (plugin.CommandExecutor.isSpectating.contains(((Player)event.getTarget()).getName())) {
+				if (SpectateManager.isSpectating(((Player)event.getTarget()))) {
 
 					event.setCancelled(true);
 
@@ -646,106 +356,9 @@ public class SpectateListener implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
+	public void onCommandPreprocess(PlayerCommandPreprocessEvent event) {
 
-		if (plugin.CommandExecutor.isSpectating.contains(event.getPlayer().getName())) {
 
-			if (plugin.conf.getBoolean("Disable commands while spectating?")) {
-
-				if (!event.getMessage().startsWith("/spectate") && !event.getMessage().startsWith("/spec")) {
-
-					event.setCancelled(true);
-					event.getPlayer().sendMessage("§cYou can not execute this command while spectating.");
-					return;
-
-				}
-
-			}
-
-		}
-
-	}
-
-	public Location getThirdPersonLocation(Player player, boolean front) {
-
-		Location playerLoc = player.getLocation();
-
-		double currentSubtraction = 0;
-		Location previousLoc = playerLoc;
-
-		while (currentSubtraction <= 5)  {
-
-			playerLoc = player.getLocation();
-
-			Vector v = player.getLocation().getDirection().normalize();
-			v.multiply(currentSubtraction);
-
-			if (front) {
-
-				playerLoc.add(v);
-
-			}else {
-
-				playerLoc.subtract(v);
-
-			}
-
-			Material tempMat = new Location(playerLoc.getWorld(), playerLoc.getX(), playerLoc.getY() + 1.5, playerLoc.getZ()).getBlock().getType();
-
-			if (tempMat != Material.AIR && tempMat != Material.WATER && tempMat != Material.STATIONARY_WATER) {
-
-				return previousLoc;
-
-			}
-
-			previousLoc = playerLoc;
-
-			currentSubtraction += 0.5;
-
-		}
-
-		return playerLoc;
-
-	}
-
-	public void clickEnable(final Player player) {
-
-		if (plugin.CommandExecutor.isClick.get(player.getName()) == null || !plugin.CommandExecutor.isClick.get(player.getName())) {
-
-			plugin.CommandExecutor.isClick.put(player.getName(), true);
-
-		}
-
-		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-			public void run() {
-
-				plugin.CommandExecutor.isClick.put(player.getName(), false);
-
-			}
-
-		}, 5L);
-
-	}
-
-	public double roundTwoDecimals(double d) {
-
-		try {
-
-			DecimalFormat twoDForm = new DecimalFormat("#.##");
-			return Double.valueOf(twoDForm.format(d));
-
-		} catch (NumberFormatException e) {
-
-			return d;
-
-		}
-
-	}
-
-	public void setExperienceCooldown(Player player, int cooldown) {
-
-		((CraftPlayer)player).getHandle().bT = cooldown;
 
 	}
 

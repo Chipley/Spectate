@@ -1,4 +1,0 @@
-- Added third person mode. To toggle between first person and third person mode, type '/spectate angle [firstperson/thirdperson]'. (Third person is a little spazzy, but it's the best I could do.)
-- Added 7 new permissions: spectate.on, spectate.off, spectate.mode, spectate.angle, spectate.scan, spectate.inv, and spectate.help.
-- Fixed spectating players being able to change their current item selected in the hotbar.
-- Updated to 1.5.1.
