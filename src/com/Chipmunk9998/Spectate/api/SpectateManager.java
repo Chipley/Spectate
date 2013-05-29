@@ -6,7 +6,9 @@ import java.util.HashMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import com.Chipmunk9998.Spectate.PlayerState;
 import com.Chipmunk9998.Spectate.Spectate;
@@ -23,8 +25,8 @@ public class SpectateManager {
 
 	public static ArrayList<String> isClick = new ArrayList<String>();
 
-	private static HashMap<String, Integer> mode = new HashMap<String, Integer>();
-	//private static HashMap<String, Integer> playerAngle = new HashMap<String, Integer>();
+	private static HashMap<String, Integer> playerMode = new HashMap<String, Integer>();
+	private static HashMap<String, Integer> playerAngle = new HashMap<String, Integer>();
 	//private static HashMap<String, Boolean> isScanning = new HashMap<String, Boolean>();
 
 	private static HashMap<Player, PlayerState> states = new HashMap<Player, PlayerState>();
@@ -39,10 +41,21 @@ public class SpectateManager {
 
 					if (isSpectating(p)) {
 
-						if (roundTwoDecimals(p.getLocation().getX()) != roundTwoDecimals(getTarget(p).getLocation().getX()) || roundTwoDecimals(p.getLocation().getY()) != roundTwoDecimals(getTarget(p).getLocation().getY()) || roundTwoDecimals(p.getLocation().getZ()) != roundTwoDecimals(getTarget(p).getLocation().getZ()) || roundTwoDecimals(p.getLocation().getYaw()) != roundTwoDecimals(getTarget(p).getLocation().getYaw()) || roundTwoDecimals(p.getLocation().getPitch()) != roundTwoDecimals(getTarget(p).getLocation().getPitch())) {
+						if (getSpectateAngle(p) == 1) {
 
-							Location loc = new Location(getTarget(p).getWorld(), getTarget(p).getLocation().getX(), getTarget(p).getLocation().getY(), getTarget(p).getLocation().getZ(), getTarget(p).getLocation().getYaw(), getTarget(p).getLocation().getPitch());
-							p.teleport(loc);
+							if (roundTwoDecimals(p.getLocation().getX()) != roundTwoDecimals(getTarget(p).getLocation().getX()) || roundTwoDecimals(p.getLocation().getY()) != roundTwoDecimals(getTarget(p).getLocation().getY()) || roundTwoDecimals(p.getLocation().getZ()) != roundTwoDecimals(getTarget(p).getLocation().getZ()) || roundTwoDecimals(p.getLocation().getYaw()) != roundTwoDecimals(getTarget(p).getLocation().getYaw()) || roundTwoDecimals(p.getLocation().getPitch()) != roundTwoDecimals(getTarget(p).getLocation().getPitch())) {
+
+								p.teleport(getTarget(p));
+
+							}
+
+						}else {
+
+							if (getSpectateAngle(p) != 4) {
+
+								p.teleport(getSpectateLocation(p));
+
+							}
 
 						}
 
@@ -118,7 +131,15 @@ public class SpectateManager {
 
 		}
 
-		p.hidePlayer(target);
+		if (getSpectateAngle(p) == 1) {
+
+			p.hidePlayer(target);
+
+		}else {
+
+			p.showPlayer(target);
+
+		}
 
 		p.setPlayerListName(playerListName);
 
@@ -139,16 +160,6 @@ public class SpectateManager {
 		if (loadState) {
 
 			loadPlayerState(p);
-
-		}
-
-		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
-
-			if (!getVanishedFromList(p).contains(onlinePlayers)) {
-
-				onlinePlayers.showPlayer(p);
-
-			}
 
 		}
 
@@ -258,31 +269,57 @@ public class SpectateManager {
 
 	public static void setSpectateMode(Player p, int newMode) {
 
-		mode.put(p.getName(), newMode);
+		playerMode.put(p.getName(), newMode);
 
 	}
 
 	public static int getSpectateMode(Player p) {
 
-		if (mode.get(p.getName()) == null) {
+		if (playerMode.get(p.getName()) == null) {
 
 			return 1;
 
 		}
 
-		return mode.get(p.getName());
+		return playerMode.get(p.getName());
 
 	}
 
-	public static void setSpectateAngle(Player p, String mode) {
+	public static void setSpectateAngle(Player p, int newAngle) {
+		
+		if (SpectateManager.isSpectating(p)) {
+			
+			if (newAngle == 1) {
+				
+				p.hidePlayer(SpectateManager.getTarget(p));
+				
+			}else {
+				
+				p.showPlayer(SpectateManager.getTarget(p));
+				
+			}
+			
+			if (newAngle == 4) {
+				
+				p.teleport(SpectateManager.getTarget(p));
+				
+			}
+			
+		}
 
-
+		playerAngle.put(p.getName(), newAngle);
 
 	}
 
-	public static void getSpectateAngle(Player p) {
+	public static int getSpectateAngle(Player p) {
 
+		if (playerAngle.get(p.getName()) == null) {
 
+			return 1;
+
+		}
+
+		return playerAngle.get(p.getName());
 
 	}
 
@@ -480,6 +517,60 @@ public class SpectateManager {
 
 	}
 
+	public static Location getSpectateLocation(Player p) {
+
+		Location playerLoc = getTarget(p).getLocation();
+
+		double currentSubtraction = 0;
+		Location previousLoc = playerLoc;
+
+		while (currentSubtraction <= 5)  {
+
+			playerLoc = getTarget(p).getLocation();
+
+			Vector v = getTarget(p).getLocation().getDirection().normalize();
+			v.multiply(currentSubtraction);
+
+			if (getSpectateAngle(p) == 2) {
+
+				playerLoc.subtract(v);
+
+			}else if (getSpectateAngle(p) == 3) {
+
+				playerLoc.add(v);
+
+				if (playerLoc.getYaw() < -180) {
+
+					playerLoc.setYaw(playerLoc.getYaw() + 180);
+
+				}else {
+
+					playerLoc.setYaw(playerLoc.getYaw() - 180);
+
+				}
+
+				playerLoc.setPitch(-playerLoc.getPitch());
+
+			}
+
+			Material tempMat = new Location(playerLoc.getWorld(), playerLoc.getX(), playerLoc.getY() + 1.5, playerLoc.getZ()).getBlock().getType();
+
+			if (tempMat != Material.AIR && tempMat != Material.WATER && tempMat != Material.STATIONARY_WATER) {
+
+				return previousLoc;
+
+			}
+
+			previousLoc = playerLoc;
+
+			currentSubtraction += 0.5;
+
+		}
+
+		return playerLoc;
+
+	}
+
 	public static PlayerState getPlayerState(Player p) {
 
 		return states.get(p);
@@ -509,6 +600,17 @@ public class SpectateManager {
 		toPlayer.setHealth(state.health);
 		toPlayer.setTotalExperience(state.xp);
 		toPlayer.getInventory().setHeldItemSlot(state.slot);
+		
+		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
+
+			if (!getVanishedFromList(fromState).contains(onlinePlayers)) {
+
+				onlinePlayers.showPlayer(fromState);
+
+			}
+
+		}
+		
 		toPlayer.teleport(state.location);
 
 		states.remove(fromState);

@@ -134,8 +134,70 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					return true;
 
 				}
+				
+				int newAngle = 0;
 
-				SpectateManager.setSpectateAngle(cmdsender, args[1]);
+				if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("firstperson")) {
+
+					if (SpectateManager.getSpectateAngle(cmdsender) == 1) {
+
+						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in first person mode.");
+
+					}else {
+
+						newAngle = 1;
+						
+						cmdsender.sendMessage(ChatColor.GRAY + "You are now in first person mode.");
+
+					}
+
+				}else if (args[1].equalsIgnoreCase("2") || args[1].equalsIgnoreCase("thirdperson")) {
+
+					if (SpectateManager.getSpectateAngle(cmdsender) == 2) {
+
+						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in third person mode.");
+
+					}else {
+
+						newAngle = 2;
+						cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person mode.");
+
+					}
+
+				}else if (args[1].equalsIgnoreCase("3") || args[1].equalsIgnoreCase("thirdpersonfront")) {
+
+					if (SpectateManager.getSpectateAngle(cmdsender) == 3) {
+
+						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in third person front mode.");
+
+					}else {
+
+						newAngle = 3;
+						cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person front mode.");
+
+					}
+
+				}else if (args[1].equalsIgnoreCase("4") || args[1].equalsIgnoreCase("freeroam")) {
+
+					if (SpectateManager.getSpectateAngle(cmdsender) == 4) {
+
+						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in free roam mode.");
+
+					}else {
+
+						newAngle = 4;
+						cmdsender.sendMessage(ChatColor.GRAY + "You are now in free roam mode.");
+
+					}
+
+				}else {
+
+					cmdsender.sendMessage(ChatColor.RED + "Error: Unknown angle \"" + args[1] + "\"");
+					return true;
+
+				}
+
+				SpectateManager.setSpectateAngle(cmdsender, newAngle);
 				return true;
 
 			}else if (args[0].equalsIgnoreCase("scan")) {
@@ -170,7 +232,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 				SpectateManager.startScanning(cmdsender, interval);
 				return true;
 
-			}else if (args[0].equalsIgnoreCase("scan")) {
+			}else if (args[0].equalsIgnoreCase("help")) {
 				
 				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.use")) {
 					
