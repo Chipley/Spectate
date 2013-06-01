@@ -2,6 +2,7 @@ package com.Chipmunk9998.Spectate;
 
 import java.util.ArrayList;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,6 +16,7 @@ public class PlayerState {
 	public int health;
 	public int xp;
 	public int slot;
+	public GameMode mode;
 	public Location location;
 
 	public ArrayList<Player> vanishedFrom = new ArrayList<Player>();
@@ -28,6 +30,7 @@ public class PlayerState {
 		health = p.getHealth();
 		xp = p.getTotalExperience();
 		slot = p.getInventory().getHeldItemSlot();
+		mode = p.getGameMode();
 		location = p.getLocation();
 
 		for (Player players : p.getWorld().getPlayers()) {

@@ -142,6 +142,8 @@ public class SpectateManager {
 		}
 
 		p.setPlayerListName(playerListName);
+		
+		p.setGameMode(target.getGameMode());
 
 		setSpectating(p, true);
 		setBeingSpectated(target, true);
@@ -600,6 +602,7 @@ public class SpectateManager {
 		toPlayer.setHealth(state.health);
 		toPlayer.setTotalExperience(state.xp);
 		toPlayer.getInventory().setHeldItemSlot(state.slot);
+		toPlayer.setGameMode(state.mode);
 		
 		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
 

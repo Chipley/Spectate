@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -19,8 +20,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -37,6 +40,17 @@ public class SpectateListener implements Listener {
 		this.plugin = plugin;
 
 	}
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		
+		for (Player p : SpectateManager.getSpectatingPlayers()) {
+			
+			event.getPlayer().hidePlayer(p);
+			
+		}
+		
+	}
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
@@ -51,18 +65,18 @@ public class SpectateListener implements Listener {
 			for (Player p : SpectateManager.getSpectators(event.getPlayer())) {
 
 				if (SpectateManager.getSpectateMode(event.getPlayer()) == 2) {
-					
+
 					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, SpectateManager.getSpectateablePlayers(), ScrollDirection.LEFT);
 					plugin.getServer().getPluginManager().callEvent(event);
-					
+
 					ArrayList<Player> playerList = scrollEvent.getSpectateList();
-					
+
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has disconnected.");
-					
+
 					if (!SpectateManager.scrollRight(event.getPlayer(), playerList)) {
-						
+
 						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
-						
+
 					}
 
 				}else {
@@ -79,27 +93,27 @@ public class SpectateListener implements Listener {
 		}
 
 	}
-	
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
-		
+
 		if (SpectateManager.isBeingSpectated(event.getEntity())) {
 
 			for (Player p : SpectateManager.getSpectators(event.getEntity())) {
 
 				if (SpectateManager.getSpectateMode(event.getEntity()) == 2) {
-					
+
 					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, SpectateManager.getSpectateablePlayers(), ScrollDirection.LEFT);
 					plugin.getServer().getPluginManager().callEvent(event);
-					
+
 					ArrayList<Player> playerList = scrollEvent.getSpectateList();
-					
+
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has died.");
-					
+
 					if (!SpectateManager.scrollRight(event.getEntity(), playerList)) {
-						
+
 						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
-						
+
 					}
 
 				}else {
@@ -114,44 +128,44 @@ public class SpectateListener implements Listener {
 			return;
 
 		}
-		
+
 	}
-	
+
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent event) {
-		
+
 		if (event instanceof EntityDamageByEntityEvent) {
-			
+
 			EntityDamageByEntityEvent event1 = (EntityDamageByEntityEvent) event;
-			
+
 			if (event1.getDamager() instanceof Player) {
-				
+
 				if (SpectateManager.isSpectating((Player)event1.getDamager())) {
-					
+
 					event.setCancelled(true);
 					return;
-					
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		if (!(event.getEntity() instanceof Player)) {
-			
+
 			return;
-			
+
 		}
-		
+
 		Player p = (Player) event.getEntity();
-		
+
 		if (SpectateManager.isSpectating(p)) {
-			
+
 			event.setCancelled(true);
 			return;
-			
+
 		}
-		
+
 	}
 
 	@EventHandler
@@ -216,6 +230,25 @@ public class SpectateListener implements Listener {
 
 			event.setCancelled(true);
 			return;
+
+		}
+
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+
+		if (!event.isCancelled()) {
+
+			if (SpectateManager.isBeingSpectated(event.getPlayer())) {
+
+				for (Player p : SpectateManager.getSpectators(event.getPlayer())) {
+
+					p.setGameMode(event.getNewGameMode());
+
+				}
+
+			}
 
 		}
 
