@@ -72,12 +72,6 @@ public class SpectateManager {
 
 						}
 
-						p.setFoodLevel(getTarget(p).getFoodLevel());
-
-						p.setLevel(0);
-						p.setExp(0);
-						p.setTotalExperience(getTarget(p).getTotalExperience());
-
 						p.getInventory().setHeldItemSlot(getTarget(p).getInventory().getHeldItemSlot());
 
 					}
@@ -105,6 +99,7 @@ public class SpectateManager {
 		if (spectateTask != -1) {
 
 			plugin.getServer().getScheduler().cancelTask(spectateTask);
+			spectateTask = -1;
 
 		}
 
@@ -144,6 +139,8 @@ public class SpectateManager {
 		p.setPlayerListName(playerListName);
 		
 		p.setGameMode(target.getGameMode());
+		p.setFoodLevel(target.getFoodLevel());
+		p.setTotalExperience(target.getTotalExperience());
 
 		setSpectating(p, true);
 		setBeingSpectated(target, true);
@@ -250,20 +247,6 @@ public class SpectateManager {
 		}
 
 		playerList.remove(p);
-
-		int number = 0;
-
-		for (Player players : playerList) {
-
-			number++;
-
-			if (players.getName().equals(getTarget(p).getName())) {
-
-				break;
-
-			}
-
-		}
 
 		return playerList.indexOf(getTarget(p)) + 1;
 

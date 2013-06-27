@@ -15,11 +15,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -40,16 +42,16 @@ public class SpectateListener implements Listener {
 		this.plugin = plugin;
 
 	}
-	
+
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		
+
 		for (Player p : SpectateManager.getSpectatingPlayers()) {
-			
+
 			event.getPlayer().hidePlayer(p);
-			
+
 		}
-		
+
 	}
 
 	@EventHandler
@@ -236,6 +238,46 @@ public class SpectateListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+
+		if (event.getEntity() instanceof Player) {
+
+			Player player = (Player) event.getEntity();
+
+			if (!event.isCancelled()) {
+
+				if (SpectateManager.isBeingSpectated(player)) {
+
+					for (Player p : SpectateManager.getSpectators(player)) {
+
+						p.setFoodLevel(event.getFoodLevel());
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerExpChange(PlayerExpChangeEvent event) {
+
+		if (SpectateManager.isBeingSpectated(event.getPlayer())) {
+
+			for (Player p : SpectateManager.getSpectators(event.getPlayer())) {
+
+				p.setTotalExperience(event.getPlayer().getTotalExperience());
+
+			}
+
+		}
+
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
 
 		if (!event.isCancelled()) {
@@ -391,7 +433,7 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onCommandPreprocess(PlayerCommandPreprocessEvent event) {
 
-
+		//check the option for disabling commands in the config and cancel it here if the command isn't /spectate
 
 	}
 
