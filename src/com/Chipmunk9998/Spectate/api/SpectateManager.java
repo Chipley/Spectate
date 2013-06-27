@@ -587,6 +587,8 @@ public class SpectateManager {
 	public static void loadPlayerState(Player fromState, Player toPlayer) {
 
 		PlayerState state = getPlayerState(fromState);
+		
+		toPlayer.teleport(state.location);
 
 		toPlayer.getInventory().setContents(state.inventory);
 		toPlayer.getInventory().setArmorContents(state.armor);
@@ -606,8 +608,6 @@ public class SpectateManager {
 			}
 
 		}
-
-		toPlayer.teleport(state.location);
 
 		states.remove(fromState);
 

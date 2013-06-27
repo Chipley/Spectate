@@ -56,12 +56,12 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				if (!SpectateManager.isSpectating(cmdsender)) {
 
-					cmdsender.sendMessage("§7You are not currently spectating anyone.");
+					cmdsender.sendMessage(ChatColor.GRAY + "You are not currently spectating anyone.");
 					return true;
 
 				}
 
-				cmdsender.sendMessage("§7You have stopped spectating " + SpectateManager.getTarget(cmdsender).getName() + ".");
+				cmdsender.sendMessage(ChatColor.GRAY + "You have stopped spectating " + SpectateManager.getTarget(cmdsender).getName() + ".");
 				SpectateManager.stopSpectating(cmdsender, true);
 				return true;
 
@@ -76,7 +76,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				if (args.length < 2) {
 
-					cmdsender.sendMessage("Error: You must enter in a mode.");
+					cmdsender.sendMessage(ChatColor.RED + "Error: You must enter in a mode.");
 					return true;
 
 				}
@@ -130,7 +130,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				if (args.length < 2) {
 
-					cmdsender.sendMessage("Error: You must enter in an angle.");
+					cmdsender.sendMessage(ChatColor.RED + "Error: You must enter in an angle.");
 					return true;
 
 				}
@@ -211,7 +211,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				if (args.length < 2) {
 
-					cmdsender.sendMessage("Error: You must enter in an interval.");
+					cmdsender.sendMessage(ChatColor.RED + "Error: You must enter in an interval.");
 					return true;
 
 				}
@@ -224,7 +224,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}catch (NumberFormatException e) {
 
-					cmdsender.sendMessage("§cError: " + args[1] + " is not a number.");
+					cmdsender.sendMessage(ChatColor.RED + "Error: " + args[1] + " is not a number.");
 					return true;
 
 				}
@@ -271,9 +271,9 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			if (SpectateManager.isSpectating(cmdsender)) {
 
-				if (targetPlayer.getName().equals(SpectateManager.getTarget(cmdsender))) {
+				if (targetPlayer.getName().equals(SpectateManager.getTarget(cmdsender).getName())) {
 
-					cmdsender.sendMessage("§7You are already spectating them.");
+					cmdsender.sendMessage(ChatColor.GRAY + "You are already spectating them.");
 					return true;
 
 				}
@@ -282,14 +282,14 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			if (SpectateManager.isSpectating(targetPlayer)) {
 
-				cmdsender.sendMessage("§7They are currently spectating someone.");
+				cmdsender.sendMessage(ChatColor.GRAY + "They are currently spectating someone.");
 				return true;
 
 			}
 
 			if (targetPlayer.isDead()) {
 
-				cmdsender.sendMessage("§7They are currently dead.");
+				cmdsender.sendMessage(ChatColor.GRAY + "They are currently dead.");
 				return true;
 
 			}
