@@ -21,7 +21,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -255,21 +254,6 @@ public class SpectateListener implements Listener {
 					}
 
 				}
-
-			}
-
-		}
-
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerExpChange(PlayerExpChangeEvent event) {
-
-		if (SpectateManager.isBeingSpectated(event.getPlayer())) {
-
-			for (Player p : SpectateManager.getSpectators(event.getPlayer())) {
-
-				p.setTotalExperience(event.getPlayer().getTotalExperience());
 
 			}
 

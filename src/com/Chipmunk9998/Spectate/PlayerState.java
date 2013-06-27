@@ -14,7 +14,8 @@ public class PlayerState {
 	public ItemStack[] armor;
 	public int hunger;
 	public int health;
-	public int xp;
+	public int level;
+	public float exp;
 	public int slot;
 	public GameMode mode;
 	public Location location;
@@ -28,7 +29,8 @@ public class PlayerState {
 		armor = p.getInventory().getArmorContents();
 		hunger = p.getFoodLevel();
 		health = p.getHealth();
-		xp = p.getTotalExperience();
+		level = p.getLevel();
+		exp = p.getExp();
 		slot = p.getInventory().getHeldItemSlot();
 		mode = p.getGameMode();
 		location = p.getLocation();

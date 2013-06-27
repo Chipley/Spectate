@@ -4,9 +4,12 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.server.v1_5_R3.EntityPlayer;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -71,6 +74,9 @@ public class SpectateManager {
 							p.setHealth(1);
 
 						}
+						
+						p.setLevel(getTarget(p).getLevel());
+						p.setExp(getTarget(p).getExp());
 
 						p.getInventory().setHeldItemSlot(getTarget(p).getInventory().getHeldItemSlot());
 
@@ -137,10 +143,11 @@ public class SpectateManager {
 		}
 
 		p.setPlayerListName(playerListName);
-		
+
 		p.setGameMode(target.getGameMode());
 		p.setFoodLevel(target.getFoodLevel());
-		p.setTotalExperience(target.getTotalExperience());
+		
+		setExperienceCooldown(p, Integer.MAX_VALUE);
 
 		setSpectating(p, true);
 		setBeingSpectated(target, true);
@@ -161,6 +168,8 @@ public class SpectateManager {
 			loadPlayerState(p);
 
 		}
+		
+		setExperienceCooldown(p, 0);
 
 		p.showPlayer(getTarget(p));
 
@@ -271,25 +280,25 @@ public class SpectateManager {
 	}
 
 	public static void setSpectateAngle(Player p, int newAngle) {
-		
+
 		if (SpectateManager.isSpectating(p)) {
-			
+
 			if (newAngle == 1) {
-				
+
 				p.hidePlayer(SpectateManager.getTarget(p));
-				
+
 			}else {
-				
+
 				p.showPlayer(SpectateManager.getTarget(p));
-				
+
 			}
-			
+
 			if (newAngle == 4) {
-				
+
 				p.teleport(SpectateManager.getTarget(p));
-				
+
 			}
-			
+
 		}
 
 		playerAngle.put(p.getName(), newAngle);
@@ -583,10 +592,11 @@ public class SpectateManager {
 		toPlayer.getInventory().setArmorContents(state.armor);
 		toPlayer.setFoodLevel(state.hunger);
 		toPlayer.setHealth(state.health);
-		toPlayer.setTotalExperience(state.xp);
+		toPlayer.setLevel(state.level);
+		toPlayer.setExp(state.exp);
 		toPlayer.getInventory().setHeldItemSlot(state.slot);
 		toPlayer.setGameMode(state.mode);
-		
+
 		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
 
 			if (!getVanishedFromList(fromState).contains(onlinePlayers)) {
@@ -596,7 +606,7 @@ public class SpectateManager {
 			}
 
 		}
-		
+
 		toPlayer.teleport(state.location);
 
 		states.remove(fromState);
@@ -612,6 +622,14 @@ public class SpectateManager {
 	public static void setPlugin(Spectate pl) {
 
 		SpectateManager.plugin = pl;
+
+	}
+
+	public static void setExperienceCooldown(Player p, int cooldown) {
+
+		CraftPlayer craft = (CraftPlayer) p;
+		EntityPlayer entity = (EntityPlayer) craft.getHandle();
+		entity.bT = cooldown;
 
 	}
 
