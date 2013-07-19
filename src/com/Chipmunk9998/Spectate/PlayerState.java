@@ -13,7 +13,7 @@ public class PlayerState {
 	public ItemStack[] inventory;
 	public ItemStack[] armor;
 	public int hunger;
-	public int health;
+	public double health;
 	public int level;
 	public float exp;
 	public int slot;

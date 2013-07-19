@@ -65,7 +65,7 @@ public class SpectateListener implements Listener {
 
 			for (Player p : SpectateManager.getSpectators(event.getPlayer())) {
 
-				if (SpectateManager.getSpectateMode(event.getPlayer()) == 2) {
+				if (SpectateManager.getSpectateMode(p) == 2 || SpectateManager.isScanning(p)) {
 
 					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, SpectateManager.getSpectateablePlayers(), ScrollDirection.LEFT);
 					plugin.getServer().getPluginManager().callEvent(event);
@@ -74,8 +74,9 @@ public class SpectateListener implements Listener {
 
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has disconnected.");
 
-					if (!SpectateManager.scrollRight(event.getPlayer(), playerList)) {
-
+					if (!SpectateManager.scrollRight(p, playerList)) {
+						
+						SpectateManager.stopSpectating(p, true);
 						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
 
 					}
@@ -102,7 +103,7 @@ public class SpectateListener implements Listener {
 
 			for (Player p : SpectateManager.getSpectators(event.getEntity())) {
 
-				if (SpectateManager.getSpectateMode(event.getEntity()) == 2) {
+				if (SpectateManager.getSpectateMode(p) == 2 || SpectateManager.isScanning(p)) {
 
 					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, SpectateManager.getSpectateablePlayers(), ScrollDirection.LEFT);
 					plugin.getServer().getPluginManager().callEvent(event);
@@ -111,8 +112,9 @@ public class SpectateListener implements Listener {
 
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has died.");
 
-					if (!SpectateManager.scrollRight(event.getEntity(), playerList)) {
-
+					if (!SpectateManager.scrollRight(p, playerList)) {
+						
+						SpectateManager.stopSpectating(p, true);
 						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
 
 					}

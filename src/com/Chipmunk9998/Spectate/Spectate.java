@@ -8,7 +8,6 @@ import com.Chipmunk9998.Spectate.api.SpectateManager;
 
 public class Spectate extends JavaPlugin {
 	
-	//TODO: Scanning
 	//TODO: Control command
 	//TODO: Fix inventory compatibility (Multiverse Inventories, Mob Arena)
 	//TODO: Config

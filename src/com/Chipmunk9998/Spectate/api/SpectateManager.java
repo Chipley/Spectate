@@ -4,12 +4,12 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.minecraft.server.v1_5_R3.EntityPlayer;
+import net.minecraft.server.v1_6_R2.EntityPlayer;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_6_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -30,7 +30,9 @@ public class SpectateManager {
 
 	private static HashMap<String, Integer> playerMode = new HashMap<String, Integer>();
 	private static HashMap<String, Integer> playerAngle = new HashMap<String, Integer>();
-	//private static HashMap<String, Boolean> isScanning = new HashMap<String, Boolean>();
+	
+	private static ArrayList<String> isScanning = new ArrayList<String>();
+	private static HashMap<String, Integer> scanTask = new HashMap<String, Integer>();
 
 	private static HashMap<Player, PlayerState> states = new HashMap<Player, PlayerState>();
 
@@ -74,6 +76,8 @@ public class SpectateManager {
 							p.setHealth(1);
 
 						}
+						
+						p.getLocation().distance(p.getLocation());
 						
 						p.setLevel(getTarget(p).getLevel());
 						p.setExp(getTarget(p).getExp());
@@ -162,6 +166,12 @@ public class SpectateManager {
 		setBeingSpectated(getTarget(p), false);
 
 		removeSpectator(getTarget(p), p);
+		
+		if (isScanning(p)) {
+			
+			stopScanning(p);
+			
+		}
 
 		if (loadState) {
 
@@ -317,10 +327,39 @@ public class SpectateManager {
 
 	}
 
-	public static void startScanning(Player p, int interval) {
+	public static void startScanning(final Player p, int interval) {
+		
+		isScanning.add(p.getName());
 
+		scanTask.put(p.getName(), plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
+			public void run() {
 
+				scrollRight(p, getSpectateablePlayers());
+
+			}
+
+		}, 0, 20 * interval));
+
+	}
+	
+	public static void stopScanning(Player p) {
+		
+		plugin.getServer().getScheduler().cancelTask(scanTask.get(p.getName()));
+		isScanning.remove(p.getName());
+		
+	}
+	
+	public static boolean isScanning(Player p) {
+		
+		if (isScanning.contains(p.getName())) {
+			
+			return true;
+			
+		}
+		
+		return false;
+		
 	}
 
 	public static ArrayList<Player> getSpectateablePlayers() {
@@ -570,6 +609,13 @@ public class SpectateManager {
 		return states.get(p);
 
 	}
+	
+	//vanish them
+	//teleport to same world as target
+	//save state
+	
+	//restore inventory
+	//teleport them back to original world
 
 	public static void savePlayerState(Player p) {
 
@@ -588,8 +634,6 @@ public class SpectateManager {
 
 		PlayerState state = getPlayerState(fromState);
 		
-		toPlayer.teleport(state.location);
-
 		toPlayer.getInventory().setContents(state.inventory);
 		toPlayer.getInventory().setArmorContents(state.armor);
 		toPlayer.setFoodLevel(state.hunger);
@@ -598,6 +642,8 @@ public class SpectateManager {
 		toPlayer.setExp(state.exp);
 		toPlayer.getInventory().setHeldItemSlot(state.slot);
 		toPlayer.setGameMode(state.mode);
+		
+		toPlayer.teleport(state.location);
 
 		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
 
@@ -629,7 +675,7 @@ public class SpectateManager {
 
 		CraftPlayer craft = (CraftPlayer) p;
 		EntityPlayer entity = (EntityPlayer) craft.getHandle();
-		entity.bT = cooldown;
+		entity.bv = cooldown;
 
 	}
 
