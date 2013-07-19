@@ -77,8 +77,6 @@ public class SpectateManager {
 
 						}
 						
-						p.getLocation().distance(p.getLocation());
-						
 						p.setLevel(getTarget(p).getLevel());
 						p.setExp(getTarget(p).getExp());
 
