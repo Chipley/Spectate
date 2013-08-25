@@ -18,25 +18,25 @@ import com.Chipmunk9998.Spectate.Spectate;
 
 public class SpectateManager {
 
-	private static Spectate plugin;
-	private static int spectateTask = -1;
+	private Spectate plugin;
+	private int spectateTask = -1;
 
-	private static ArrayList<Player> isSpectating = new ArrayList<Player>();
-	private static ArrayList<Player> isBeingSpectated = new ArrayList<Player>();
-	private static HashMap<Player, ArrayList<Player>> spectators = new HashMap<Player, ArrayList<Player>>();
-	private static HashMap<Player, Player> target = new HashMap<Player, Player>();
+	private ArrayList<Player> isSpectating = new ArrayList<Player>();
+	private ArrayList<Player> isBeingSpectated = new ArrayList<Player>();
+	private HashMap<Player, ArrayList<Player>> spectators = new HashMap<Player, ArrayList<Player>>();
+	private HashMap<Player, Player> target = new HashMap<Player, Player>();
 
-	public static ArrayList<String> isClick = new ArrayList<String>();
+	public ArrayList<String> isClick = new ArrayList<String>();
 
-	private static HashMap<String, Integer> playerMode = new HashMap<String, Integer>();
-	private static HashMap<String, Integer> playerAngle = new HashMap<String, Integer>();
+	private HashMap<String, Integer> playerMode = new HashMap<String, Integer>();
+	private HashMap<String, Integer> playerAngle = new HashMap<String, Integer>();
 	
-	private static ArrayList<String> isScanning = new ArrayList<String>();
-	private static HashMap<String, Integer> scanTask = new HashMap<String, Integer>();
+	private ArrayList<String> isScanning = new ArrayList<String>();
+	private HashMap<String, Integer> scanTask = new HashMap<String, Integer>();
 
-	private static HashMap<Player, PlayerState> states = new HashMap<Player, PlayerState>();
+	private HashMap<Player, PlayerState> states = new HashMap<Player, PlayerState>();
 
-	private static void updateSpectators() {
+	private void updateSpectators() {
 
 		spectateTask = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
@@ -92,7 +92,7 @@ public class SpectateManager {
 
 	}
 
-	public static void startSpectateTask() {
+	public void startSpectateTask() {
 
 		if (spectateTask == -1) {
 
@@ -102,7 +102,7 @@ public class SpectateManager {
 
 	}
 
-	public static void stopSpectateTask() {
+	public void stopSpectateTask() {
 
 		if (spectateTask != -1) {
 
@@ -113,7 +113,15 @@ public class SpectateManager {
 
 	}
 
-	public static void startSpectating(Player p, Player target) {
+	public void startSpectating(Player p, Player target, boolean saveState) {
+		
+		for (Player player1 : plugin.getServer().getOnlinePlayers()) {
+
+			player1.hidePlayer(p);
+
+		}
+		
+		p.teleport(target);
 
 		if (isSpectating(p)) {
 
@@ -121,18 +129,16 @@ public class SpectateManager {
 			p.showPlayer(getTarget(p));
 			removeSpectator(getTarget(p), p);
 
+		}else if (saveState) {
+			
+			savePlayerState(p);
+			
 		}
 
 		setTarget(p, target);
 		addSpectator(target, p);
 
 		String playerListName = p.getPlayerListName();
-
-		for (Player player1 : plugin.getServer().getOnlinePlayers()) {
-
-			player1.hidePlayer(p);
-
-		}
 
 		if (getSpectateAngle(p) == 1) {
 
@@ -158,7 +164,7 @@ public class SpectateManager {
 
 	}
 
-	public static void stopSpectating(Player p, boolean loadState) {
+	public void stopSpectating(Player p, boolean loadState) {
 
 		setSpectating(p, false);
 		setBeingSpectated(getTarget(p), false);
@@ -183,7 +189,7 @@ public class SpectateManager {
 
 	}
 
-	public static boolean scrollRight(Player p, ArrayList<Player> playerList) {
+	public boolean scrollRight(Player p, ArrayList<Player> playerList) {
 
 		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.RIGHT);
 		plugin.getServer().getPluginManager().callEvent(event);
@@ -210,13 +216,13 @@ public class SpectateManager {
 
 		}
 
-		startSpectating(p, playerList.get(scrollToIndex - 1));
+		startSpectating(p, playerList.get(scrollToIndex - 1), false);
 
 		return true;
 
 	}
 
-	public static boolean scrollLeft(Player p, ArrayList<Player> playerList) {
+	public boolean scrollLeft(Player p, ArrayList<Player> playerList) {
 
 		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.LEFT);
 		plugin.getServer().getPluginManager().callEvent(event);
@@ -243,13 +249,13 @@ public class SpectateManager {
 
 		}
 
-		startSpectating(p, playerList.get(scrollToIndex - 1));
+		startSpectating(p, playerList.get(scrollToIndex - 1), false);
 
 		return true;
 
 	}
 
-	public static int getScrollNumber(Player p, ArrayList<Player> playerList) {
+	public int getScrollNumber(Player p, ArrayList<Player> playerList) {
 
 		if (!isSpectating(p)) {
 
@@ -269,13 +275,13 @@ public class SpectateManager {
 
 	}
 
-	public static void setSpectateMode(Player p, int newMode) {
+	public void setSpectateMode(Player p, int newMode) {
 
 		playerMode.put(p.getName(), newMode);
 
 	}
 
-	public static int getSpectateMode(Player p) {
+	public int getSpectateMode(Player p) {
 
 		if (playerMode.get(p.getName()) == null) {
 
@@ -287,23 +293,23 @@ public class SpectateManager {
 
 	}
 
-	public static void setSpectateAngle(Player p, int newAngle) {
+	public void setSpectateAngle(Player p, int newAngle) {
 
-		if (SpectateManager.isSpectating(p)) {
+		if (isSpectating(p)) {
 
 			if (newAngle == 1) {
 
-				p.hidePlayer(SpectateManager.getTarget(p));
+				p.hidePlayer(getTarget(p));
 
 			}else {
 
-				p.showPlayer(SpectateManager.getTarget(p));
+				p.showPlayer(getTarget(p));
 
 			}
 
 			if (newAngle == 4) {
 
-				p.teleport(SpectateManager.getTarget(p));
+				p.teleport(getTarget(p));
 
 			}
 
@@ -313,7 +319,7 @@ public class SpectateManager {
 
 	}
 
-	public static int getSpectateAngle(Player p) {
+	public int getSpectateAngle(Player p) {
 
 		if (playerAngle.get(p.getName()) == null) {
 
@@ -325,7 +331,7 @@ public class SpectateManager {
 
 	}
 
-	public static void startScanning(final Player p, int interval) {
+	public void startScanning(final Player p, int interval) {
 		
 		isScanning.add(p.getName());
 
@@ -341,14 +347,14 @@ public class SpectateManager {
 
 	}
 	
-	public static void stopScanning(Player p) {
+	public void stopScanning(Player p) {
 		
 		plugin.getServer().getScheduler().cancelTask(scanTask.get(p.getName()));
 		isScanning.remove(p.getName());
 		
 	}
 	
-	public static boolean isScanning(Player p) {
+	public boolean isScanning(Player p) {
 		
 		if (isScanning.contains(p.getName())) {
 			
@@ -360,7 +366,7 @@ public class SpectateManager {
 		
 	}
 
-	public static ArrayList<Player> getSpectateablePlayers() {
+	public ArrayList<Player> getSpectateablePlayers() {
 
 		ArrayList<Player> spectateablePlayers = new ArrayList<Player>();
 
@@ -400,31 +406,31 @@ public class SpectateManager {
 
 	}
 
-	private static void setTarget(Player p, Player ptarget) {
+	private void setTarget(Player p, Player ptarget) {
 
 		target.put(p, ptarget);
 
 	}
 
-	public static Player getTarget(Player p) {
+	public Player getTarget(Player p) {
 
 		return target.get(p);
 
 	}
 
-	public static boolean isSpectating(Player p) {
+	public boolean isSpectating(Player p) {
 
 		return isSpectating.contains(p);
 
 	}
 
-	public static boolean isBeingSpectated(Player p) {
+	public boolean isBeingSpectated(Player p) {
 
 		return isBeingSpectated.contains(p);
 
 	}
 
-	private static void setBeingSpectated(Player p, boolean beingSpectated) {
+	private void setBeingSpectated(Player p, boolean beingSpectated) {
 
 		if (beingSpectated) {
 
@@ -444,7 +450,7 @@ public class SpectateManager {
 
 	}
 
-	private static void addSpectator(Player p, Player spectator) {
+	private void addSpectator(Player p, Player spectator) {
 
 		if (spectators.get(p) == null) {
 
@@ -462,7 +468,7 @@ public class SpectateManager {
 
 	}
 
-	private static void removeSpectator(Player p, Player spectator) {
+	private void removeSpectator(Player p, Player spectator) {
 
 		if (spectators.get(p) == null) {
 
@@ -484,13 +490,13 @@ public class SpectateManager {
 
 	}
 
-	public static ArrayList<Player> getSpectators(Player p) {
+	public ArrayList<Player> getSpectators(Player p) {
 
 		return spectators.get(p);
 
 	}
 
-	public static ArrayList<Player> getSpectatingPlayers() {
+	public ArrayList<Player> getSpectatingPlayers() {
 
 		ArrayList<Player> spectatingPlayers = new ArrayList<Player>();
 
@@ -508,7 +514,7 @@ public class SpectateManager {
 
 	}
 
-	private static void setSpectating(Player p, boolean spectating) {
+	private void setSpectating(Player p, boolean spectating) {
 
 		if (spectating) {
 
@@ -528,7 +534,7 @@ public class SpectateManager {
 
 	}
 
-	public static void clickEnable(final Player player) {
+	public void clickEnable(final Player player) {
 
 		if (!isClick.contains(player.getName())) {
 
@@ -548,7 +554,7 @@ public class SpectateManager {
 
 	}
 
-	public static Location getSpectateLocation(Player p) {
+	public Location getSpectateLocation(Player p) {
 
 		Location playerLoc = getTarget(p).getLocation();
 
@@ -602,33 +608,34 @@ public class SpectateManager {
 
 	}
 
-	public static PlayerState getPlayerState(Player p) {
+	public PlayerState getPlayerState(Player p) {
 
 		return states.get(p);
 
 	}
 	
 	//vanish them
-	//teleport to same world as target
+	//teleport to target
 	//save state
 	
+	//set spectating off
 	//restore inventory
-	//teleport them back to original world
+	//teleport them back to original location
 
-	public static void savePlayerState(Player p) {
+	public void savePlayerState(Player p) {
 
 		PlayerState playerstate = new PlayerState(p);
 		states.put(p, playerstate);
 
 	}
 
-	public static void loadPlayerState(Player toPlayer) {
+	public void loadPlayerState(Player toPlayer) {
 
 		loadPlayerState(toPlayer, toPlayer);
 
 	}
 
-	public static void loadPlayerState(Player fromState, Player toPlayer) {
+	public void loadPlayerState(Player fromState, Player toPlayer) {
 
 		PlayerState state = getPlayerState(fromState);
 		
@@ -657,19 +664,13 @@ public class SpectateManager {
 
 	}
 
-	public static ArrayList<Player> getVanishedFromList(Player p) {
+	public ArrayList<Player> getVanishedFromList(Player p) {
 
 		return getPlayerState(p).vanishedFrom;
 
 	}
 
-	public static void setPlugin(Spectate pl) {
-
-		SpectateManager.plugin = pl;
-
-	}
-
-	public static void setExperienceCooldown(Player p, int cooldown) {
+	public void setExperienceCooldown(Player p, int cooldown) {
 
 		CraftPlayer craft = (CraftPlayer) p;
 		EntityPlayer entity = (EntityPlayer) craft.getHandle();
@@ -677,7 +678,7 @@ public class SpectateManager {
 
 	}
 
-	public static double roundTwoDecimals(double d) {
+	public double roundTwoDecimals(double d) {
 
 		try {
 

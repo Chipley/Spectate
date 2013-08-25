@@ -2,6 +2,7 @@ package com.Chipmunk9998.Spectate;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -35,9 +36,9 @@ public class PlayerState {
 		mode = p.getGameMode();
 		location = p.getLocation();
 
-		for (Player players : p.getWorld().getPlayers()) {
+		for (Player players : Bukkit.getServer().getOnlinePlayers()) {
 
-			if (players != p ) {
+			if (players != p) {
 
 				if (!players.canSee(p)) {
 

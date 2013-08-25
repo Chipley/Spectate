@@ -1,22 +1,13 @@
 package com.Chipmunk9998.Spectate;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.Chipmunk9998.Spectate.api.SpectateManager;
-
 public class SpectateCommandExecutor implements CommandExecutor {
-
-	Spectate plugin;
-
-	public SpectateCommandExecutor(Spectate plugin) {
-
-		this.plugin = plugin;
-
-	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
@@ -32,12 +23,12 @@ public class SpectateCommandExecutor implements CommandExecutor {
 		if (cmd.getName().equalsIgnoreCase("spectate")) {
 
 			if (args.length == 0) {
-				
+
 				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.use")) {
-					
+
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
-					
+
 				}
 
 				showHelp(cmdsender);
@@ -46,32 +37,32 @@ public class SpectateCommandExecutor implements CommandExecutor {
 			}
 
 			if (args[0].equalsIgnoreCase("off")) {
-				
+
 				if (!cmdsender.hasPermission("spectate.use")) {
-					
+
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
-					
+
 				}
 
-				if (!SpectateManager.isSpectating(cmdsender)) {
+				if (!Spectate.getAPI().isSpectating(cmdsender)) {
 
 					cmdsender.sendMessage(ChatColor.GRAY + "You are not currently spectating anyone.");
 					return true;
 
 				}
 
-				cmdsender.sendMessage(ChatColor.GRAY + "You have stopped spectating " + SpectateManager.getTarget(cmdsender).getName() + ".");
-				SpectateManager.stopSpectating(cmdsender, true);
+				cmdsender.sendMessage(ChatColor.GRAY + "You have stopped spectating " + Spectate.getAPI().getTarget(cmdsender).getName() + ".");
+				Spectate.getAPI().stopSpectating(cmdsender, true);
 				return true;
 
 			}else if (args[0].equalsIgnoreCase("mode")) {
-				
+
 				if (!cmdsender.hasPermission("spectate.mode")) {
-					
+
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
-					
+
 				}
 
 				if (args.length < 2) {
@@ -85,7 +76,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("default")) {
 
-					if (SpectateManager.getSpectateMode(cmdsender) == 1) {
+					if (Spectate.getAPI().getSpectateMode(cmdsender) == 1) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in this mode.");
 
@@ -98,7 +89,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}else if (args[1].equalsIgnoreCase("2") || args[1].equalsIgnoreCase("scroll")) {
 
-					if (SpectateManager.getSpectateMode(cmdsender) == 2) {
+					if (Spectate.getAPI().getSpectateMode(cmdsender) == 2) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in this mode.");
 
@@ -116,16 +107,16 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				SpectateManager.setSpectateMode(cmdsender, newMode);
+				Spectate.getAPI().setSpectateMode(cmdsender, newMode);
 				return true;
 
 			}else if (args[0].equalsIgnoreCase("angle")) {
-				
+
 				if (!cmdsender.hasPermission("spectate.angle")) {
-					
+
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
-					
+
 				}
 
 				if (args.length < 2) {
@@ -134,28 +125,30 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					return true;
 
 				}
-				
+
 				int newAngle = 0;
 
 				if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("firstperson")) {
 
-					if (SpectateManager.getSpectateAngle(cmdsender) == 1) {
+					if (Spectate.getAPI().getSpectateAngle(cmdsender) == 1) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in first person mode.");
+						return true;
 
 					}else {
 
 						newAngle = 1;
-						
+
 						cmdsender.sendMessage(ChatColor.GRAY + "You are now in first person mode.");
 
 					}
 
 				}else if (args[1].equalsIgnoreCase("2") || args[1].equalsIgnoreCase("thirdperson")) {
 
-					if (SpectateManager.getSpectateAngle(cmdsender) == 2) {
+					if (Spectate.getAPI().getSpectateAngle(cmdsender) == 2) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in third person mode.");
+						return true;
 
 					}else {
 
@@ -166,9 +159,10 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}else if (args[1].equalsIgnoreCase("3") || args[1].equalsIgnoreCase("thirdpersonfront")) {
 
-					if (SpectateManager.getSpectateAngle(cmdsender) == 3) {
+					if (Spectate.getAPI().getSpectateAngle(cmdsender) == 3) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in third person front mode.");
+						return true;
 
 					}else {
 
@@ -179,9 +173,10 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}else if (args[1].equalsIgnoreCase("4") || args[1].equalsIgnoreCase("freeroam")) {
 
-					if (SpectateManager.getSpectateAngle(cmdsender) == 4) {
+					if (Spectate.getAPI().getSpectateAngle(cmdsender) == 4) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in free roam mode.");
+						return true;
 
 					}else {
 
@@ -197,16 +192,23 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				SpectateManager.setSpectateAngle(cmdsender, newAngle);
+				Spectate.getAPI().setSpectateAngle(cmdsender, newAngle);
 				return true;
 
 			}else if (args[0].equalsIgnoreCase("scan")) {
-				
+
 				if (!cmdsender.hasPermission("spectate.scan")) {
-					
+
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
-					
+
+				}
+
+				if (Spectate.getAPI().isScanning(cmdsender)) {
+
+					cmdsender.sendMessage(ChatColor.RED + "You are already scanning.");
+					return true;
+
 				}
 
 				if (args.length < 2) {
@@ -215,9 +217,9 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					return true;
 
 				}
-				
+
 				int interval = 0;
-				
+
 				try {
 
 					interval = Integer.parseInt(args[1]);
@@ -229,31 +231,32 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				SpectateManager.startScanning(cmdsender, interval);
+				Spectate.getAPI().savePlayerState(cmdsender);
+				Spectate.getAPI().startScanning(cmdsender, interval);
 				return true;
 
 			}else if (args[0].equalsIgnoreCase("help")) {
-				
+
 				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.use")) {
-					
+
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
-					
+
 				}
 
 				showHelp(cmdsender);
 				return true;
 
 			}
-			
+
 			if (!cmdsender.hasPermission("spectate.use")) {
-				
+
 				cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 				return true;
-				
+
 			}
 
-			Player targetPlayer = plugin.getServer().getPlayer(args[0]);
+			Player targetPlayer = Bukkit.getServer().getPlayer(args[0]);
 
 			if (targetPlayer == null) {
 
@@ -269,9 +272,9 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}
 
-			if (SpectateManager.isSpectating(cmdsender)) {
+			if (Spectate.getAPI().isSpectating(cmdsender)) {
 
-				if (targetPlayer.getName().equals(SpectateManager.getTarget(cmdsender).getName())) {
+				if (targetPlayer.getName().equals(Spectate.getAPI().getTarget(cmdsender).getName())) {
 
 					cmdsender.sendMessage(ChatColor.GRAY + "You are already spectating them.");
 					return true;
@@ -280,7 +283,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}
 
-			if (SpectateManager.isSpectating(targetPlayer)) {
+			if (Spectate.getAPI().isSpectating(targetPlayer)) {
 
 				cmdsender.sendMessage(ChatColor.GRAY + "They are currently spectating someone.");
 				return true;
@@ -294,8 +297,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}
 
-			SpectateManager.savePlayerState(cmdsender);
-			SpectateManager.startSpectating(cmdsender, plugin.getServer().getPlayer(args[0]));
+			Spectate.getAPI().startSpectating(cmdsender, Bukkit.getServer().getPlayer(args[0]), true);
 
 			return true;
 
@@ -308,9 +310,9 @@ public class SpectateCommandExecutor implements CommandExecutor {
 		return true;
 
 	}
-	
+
 	public void showHelp(Player cmdsender) {
-		
+
 		cmdsender.sendMessage(ChatColor.RED + "Commands for Spectate:");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate [PlayerName]: " + ChatColor.GRAY + "Puts you into spectate mode and lets you see what the target sees.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate off : " + ChatColor.GRAY + "Takes you out of spectate mode.");
@@ -318,7 +320,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 		cmdsender.sendMessage(ChatColor.RED + "/spectate mode [1 | default]: " + ChatColor.GRAY + "Puts you into the default spectate mode.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate mode [2 | scroll]: " + ChatColor.GRAY + "Puts you into scroll style mode with left click and right click controls.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate help : " + ChatColor.GRAY + "Shows this help page.");
-		
+
 	}
 
 }

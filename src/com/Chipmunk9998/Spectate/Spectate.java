@@ -12,26 +12,34 @@ public class Spectate extends JavaPlugin {
 	//TODO: Fix inventory compatibility (Multiverse Inventories, Mob Arena)
 	//TODO: Config
 	
+	static SpectateManager Manager;
+	
 	public void onEnable() {
 		
-		SpectateManager.setPlugin(this);
+		Manager = new SpectateManager();
 		
-		getServer().getPluginManager().registerEvents(new SpectateListener(this), this);
-		getCommand("spectate").setExecutor(new SpectateCommandExecutor(this));
-		SpectateManager.startSpectateTask();
+		getServer().getPluginManager().registerEvents(new SpectateListener(), this);
+		getCommand("spectate").setExecutor(new SpectateCommandExecutor());
+		getAPI().startSpectateTask();
 		
 	}
 	
 	public void onDisable() {
 		
-		for (Player p : SpectateManager.getSpectatingPlayers()) {
+		for (Player p : getAPI().getSpectatingPlayers()) {
 			
-			SpectateManager.stopSpectating(p, true);
+			getAPI().stopSpectating(p, true);
 			p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because of a server reload.");
 			
 		}
 		
-		SpectateManager.stopSpectateTask();
+		getAPI().stopSpectateTask();
+		
+	}
+	
+	public static SpectateManager getAPI() {
+		
+		return Manager;
 		
 	}
 

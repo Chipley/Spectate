@@ -2,6 +2,7 @@ package com.Chipmunk9998.Spectate;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -21,6 +22,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -29,23 +31,14 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.Chipmunk9998.Spectate.api.ScrollDirection;
-import com.Chipmunk9998.Spectate.api.SpectateManager;
 import com.Chipmunk9998.Spectate.api.SpectateScrollEvent;
 
 public class SpectateListener implements Listener {
 
-	Spectate plugin;
-
-	public SpectateListener(Spectate plugin) {
-
-		this.plugin = plugin;
-
-	}
-
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 
-		for (Player p : SpectateManager.getSpectatingPlayers()) {
+		for (Player p : Spectate.getAPI().getSpectatingPlayers()) {
 
 			event.getPlayer().hidePlayer(p);
 
@@ -56,34 +49,34 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 
-		if (SpectateManager.isSpectating(event.getPlayer())) {
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
-			SpectateManager.stopSpectating(event.getPlayer(), true);
+			Spectate.getAPI().stopSpectating(event.getPlayer(), true);
 			return;
 
-		}else if (SpectateManager.isBeingSpectated(event.getPlayer())) {
+		}else if (Spectate.getAPI().isBeingSpectated(event.getPlayer())) {
 
-			for (Player p : SpectateManager.getSpectators(event.getPlayer())) {
+			for (Player p : Spectate.getAPI().getSpectators(event.getPlayer())) {
 
-				if (SpectateManager.getSpectateMode(p) == 2 || SpectateManager.isScanning(p)) {
+				if (Spectate.getAPI().getSpectateMode(p) == 2 || Spectate.getAPI().isScanning(p)) {
 
-					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, SpectateManager.getSpectateablePlayers(), ScrollDirection.LEFT);
-					plugin.getServer().getPluginManager().callEvent(event);
+					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, Spectate.getAPI().getSpectateablePlayers(), ScrollDirection.LEFT);
+					Bukkit.getServer().getPluginManager().callEvent(event);
 
 					ArrayList<Player> playerList = scrollEvent.getSpectateList();
 
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has disconnected.");
 
-					if (!SpectateManager.scrollRight(p, playerList)) {
+					if (!Spectate.getAPI().scrollRight(p, playerList)) {
 						
-						SpectateManager.stopSpectating(p, true);
+						Spectate.getAPI().stopSpectating(p, true);
 						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
 
 					}
 
 				}else {
 
-					SpectateManager.stopSpectating(p, true);
+					Spectate.getAPI().stopSpectating(p, true);
 					p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because the person you were spectating disconnected.");
 
 				}
@@ -99,29 +92,29 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 
-		if (SpectateManager.isBeingSpectated(event.getEntity())) {
+		if (Spectate.getAPI().isBeingSpectated(event.getEntity())) {
 
-			for (Player p : SpectateManager.getSpectators(event.getEntity())) {
+			for (Player p : Spectate.getAPI().getSpectators(event.getEntity())) {
 
-				if (SpectateManager.getSpectateMode(p) == 2 || SpectateManager.isScanning(p)) {
+				if (Spectate.getAPI().getSpectateMode(p) == 2 || Spectate.getAPI().isScanning(p)) {
 
-					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, SpectateManager.getSpectateablePlayers(), ScrollDirection.LEFT);
-					plugin.getServer().getPluginManager().callEvent(event);
+					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, Spectate.getAPI().getSpectateablePlayers(), ScrollDirection.LEFT);
+					Bukkit.getServer().getPluginManager().callEvent(event);
 
 					ArrayList<Player> playerList = scrollEvent.getSpectateList();
 
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has died.");
 
-					if (!SpectateManager.scrollRight(p, playerList)) {
+					if (!Spectate.getAPI().scrollRight(p, playerList)) {
 						
-						SpectateManager.stopSpectating(p, true);
+						Spectate.getAPI().stopSpectating(p, true);
 						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
 
 					}
 
 				}else {
 
-					SpectateManager.stopSpectating(p, true);
+					Spectate.getAPI().stopSpectating(p, true);
 					p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because the person you were spectating died.");
 
 				}
@@ -143,7 +136,7 @@ public class SpectateListener implements Listener {
 
 			if (event1.getDamager() instanceof Player) {
 
-				if (SpectateManager.isSpectating((Player)event1.getDamager())) {
+				if (Spectate.getAPI().isSpectating((Player)event1.getDamager())) {
 
 					event.setCancelled(true);
 					return;
@@ -162,7 +155,7 @@ public class SpectateListener implements Listener {
 
 		Player p = (Player) event.getEntity();
 
-		if (SpectateManager.isSpectating(p)) {
+		if (Spectate.getAPI().isSpectating(p)) {
 
 			event.setCancelled(true);
 			return;
@@ -174,27 +167,27 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 
-		if (SpectateManager.isSpectating(event.getPlayer())) {
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
-			if (!SpectateManager.isClick.contains(event.getPlayer().getName())) {
+			if (!Spectate.getAPI().isClick.contains(event.getPlayer().getName())) {
 
-				if (SpectateManager.getSpectateMode(event.getPlayer()) == 2) {
+				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == 2) {
 
 					if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
-						if (plugin.getServer().getOnlinePlayers().length > 2) {
+						if (Bukkit.getServer().getOnlinePlayers().length > 2) {
 
-							SpectateManager.scrollLeft(event.getPlayer(), SpectateManager.getSpectateablePlayers());
-							SpectateManager.clickEnable(event.getPlayer());
+							Spectate.getAPI().scrollLeft(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
+							Spectate.getAPI().clickEnable(event.getPlayer());
 
 						}
 
 					}else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-						if (plugin.getServer().getOnlinePlayers().length > 2) {
+						if (Bukkit.getServer().getOnlinePlayers().length > 2) {
 
-							SpectateManager.scrollRight(event.getPlayer(), SpectateManager.getSpectateablePlayers());
-							SpectateManager.clickEnable(event.getPlayer());
+							Spectate.getAPI().scrollRight(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
+							Spectate.getAPI().clickEnable(event.getPlayer());
 
 						}
 
@@ -214,16 +207,16 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 
-		if (SpectateManager.isSpectating(event.getPlayer())) {
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
-			if (!SpectateManager.isClick.contains(event.getPlayer().getName())) {
+			if (!Spectate.getAPI().isClick.contains(event.getPlayer().getName())) {
 
-				if (SpectateManager.getSpectateMode(event.getPlayer()) == 2) {
+				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == 2) {
 
-					if (plugin.getServer().getOnlinePlayers().length > 2) {
+					if (Bukkit.getServer().getOnlinePlayers().length > 2) {
 
-						SpectateManager.scrollRight(event.getPlayer(), SpectateManager.getSpectateablePlayers());
-						SpectateManager.clickEnable(event.getPlayer());
+						Spectate.getAPI().scrollRight(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
+						Spectate.getAPI().clickEnable(event.getPlayer());
 
 					}
 
@@ -247,9 +240,9 @@ public class SpectateListener implements Listener {
 
 			if (!event.isCancelled()) {
 
-				if (SpectateManager.isBeingSpectated(player)) {
+				if (Spectate.getAPI().isBeingSpectated(player)) {
 
-					for (Player p : SpectateManager.getSpectators(player)) {
+					for (Player p : Spectate.getAPI().getSpectators(player)) {
 
 						p.setFoodLevel(event.getFoodLevel());
 
@@ -268,9 +261,9 @@ public class SpectateListener implements Listener {
 
 		if (!event.isCancelled()) {
 
-			if (SpectateManager.isBeingSpectated(event.getPlayer())) {
+			if (Spectate.getAPI().isBeingSpectated(event.getPlayer())) {
 
-				for (Player p : SpectateManager.getSpectators(event.getPlayer())) {
+				for (Player p : Spectate.getAPI().getSpectators(event.getPlayer())) {
 
 					p.setGameMode(event.getNewGameMode());
 
@@ -293,9 +286,9 @@ public class SpectateListener implements Listener {
 
 		Player p = (Player) event.getPlayer();
 
-		if (SpectateManager.isBeingSpectated(p)) {
+		if (Spectate.getAPI().isBeingSpectated(p)) {
 
-			for (Player spectators : SpectateManager.getSpectators(p)) {
+			for (Player spectators : Spectate.getAPI().getSpectators(p)) {
 
 				spectators.openInventory(event.getInventory());
 
@@ -316,9 +309,9 @@ public class SpectateListener implements Listener {
 
 		Player p = (Player) event.getPlayer();
 
-		if (SpectateManager.isBeingSpectated(p)) {
+		if (Spectate.getAPI().isBeingSpectated(p)) {
 
-			for (Player spectators : SpectateManager.getSpectators(p)) {
+			for (Player spectators : Spectate.getAPI().getSpectators(p)) {
 
 				spectators.closeInventory();
 
@@ -339,7 +332,18 @@ public class SpectateListener implements Listener {
 
 		Player p = (Player) event.getWhoClicked();
 
-		if (SpectateManager.isSpectating(p)) {
+		if (Spectate.getAPI().isSpectating(p)) {
+
+			event.setCancelled(true);
+
+		}
+
+	}
+	
+	@EventHandler
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
 			event.setCancelled(true);
 
@@ -350,7 +354,7 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 
-		if (SpectateManager.isSpectating(event.getPlayer())) {
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
 			event.setCancelled(true);
 
@@ -361,7 +365,7 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 
-		if (SpectateManager.isSpectating(event.getPlayer())) {
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
 			event.setCancelled(true);
 
@@ -372,7 +376,7 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent event) {
 
-		if (SpectateManager.isSpectating(event.getPlayer())) {
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
 			event.setCancelled(true);
 
@@ -387,7 +391,7 @@ public class SpectateListener implements Listener {
 
 			Player p = (Player) event.getEntity();
 
-			if (SpectateManager.isSpectating(p)) {
+			if (Spectate.getAPI().isSpectating(p)) {
 
 				event.setCancelled(true);
 
@@ -404,7 +408,7 @@ public class SpectateListener implements Listener {
 
 			if (event.getTarget() instanceof Player) {
 
-				if (SpectateManager.isSpectating(((Player)event.getTarget()))) {
+				if (Spectate.getAPI().isSpectating(((Player)event.getTarget()))) {
 
 					event.setCancelled(true);
 
