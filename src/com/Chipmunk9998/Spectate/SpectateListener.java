@@ -176,7 +176,7 @@ public class SpectateListener implements Listener {
 
 		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
-			if (!Spectate.getAPI().isReadyForNextScroll(event.getPlayer())) {
+			if (Spectate.getAPI().isReadyForNextScroll(event.getPlayer())) {
 
 				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == SpectateMode.SCROLL) {
 
@@ -216,7 +216,7 @@ public class SpectateListener implements Listener {
 
 		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
-			if (!Spectate.getAPI().isReadyForNextScroll(event.getPlayer())) {
+			if (Spectate.getAPI().isReadyForNextScroll(event.getPlayer())) {
 
 				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == SpectateMode.SCROLL) {
 
