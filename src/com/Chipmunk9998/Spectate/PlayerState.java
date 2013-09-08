@@ -1,12 +1,14 @@
 package com.Chipmunk9998.Spectate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 public class PlayerState {
 
@@ -20,6 +22,8 @@ public class PlayerState {
 	public int slot;
 	public GameMode mode;
 	public Location location;
+	
+	public Collection<PotionEffect> potions;
 
 	public ArrayList<Player> vanishedFrom = new ArrayList<Player>();
 
@@ -35,6 +39,8 @@ public class PlayerState {
 		slot = p.getInventory().getHeldItemSlot();
 		mode = p.getGameMode();
 		location = p.getLocation();
+		
+		potions = p.getActivePotionEffects();
 
 		for (Player players : Bukkit.getServer().getOnlinePlayers()) {
 

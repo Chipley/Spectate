@@ -7,6 +7,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.Chipmunk9998.Spectate.api.SpectateAngle;
+import com.Chipmunk9998.Spectate.api.SpectateMode;
+
 public class SpectateCommandExecutor implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -72,30 +75,30 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				int newMode = 0;
+				SpectateMode newMode = SpectateMode.DEFAULT;
 
 				if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("default")) {
 
-					if (Spectate.getAPI().getSpectateMode(cmdsender) == 1) {
+					if (Spectate.getAPI().getSpectateMode(cmdsender) == SpectateMode.DEFAULT) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in this mode.");
 
 					}else {
 
-						newMode = 1;
+						newMode = SpectateMode.DEFAULT;
 						cmdsender.sendMessage(ChatColor.GRAY + "You are now using the default spectate mode.");
 
 					}
 
 				}else if (args[1].equalsIgnoreCase("2") || args[1].equalsIgnoreCase("scroll")) {
 
-					if (Spectate.getAPI().getSpectateMode(cmdsender) == 2) {
+					if (Spectate.getAPI().getSpectateMode(cmdsender) == SpectateMode.SCROLL) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in this mode.");
 
 					}else {
 
-						newMode = 2;
+						newMode = SpectateMode.SCROLL;
 						cmdsender.sendMessage(ChatColor.GRAY + "You are now using the scroll spectate mode.");
 
 					}
@@ -126,61 +129,60 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				int newAngle = 0;
+				SpectateAngle newAngle = SpectateAngle.FIRST_PERSON;
 
 				if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("firstperson")) {
 
-					if (Spectate.getAPI().getSpectateAngle(cmdsender) == 1) {
+					if (Spectate.getAPI().getSpectateAngle(cmdsender) == SpectateAngle.FIRST_PERSON) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in first person mode.");
 						return true;
 
 					}else {
 
-						newAngle = 1;
-
+						newAngle = SpectateAngle.FIRST_PERSON;
 						cmdsender.sendMessage(ChatColor.GRAY + "You are now in first person mode.");
 
 					}
 
 				}else if (args[1].equalsIgnoreCase("2") || args[1].equalsIgnoreCase("thirdperson")) {
 
-					if (Spectate.getAPI().getSpectateAngle(cmdsender) == 2) {
+					if (Spectate.getAPI().getSpectateAngle(cmdsender) == SpectateAngle.THIRD_PERSON) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in third person mode.");
 						return true;
 
 					}else {
 
-						newAngle = 2;
+						newAngle = SpectateAngle.THIRD_PERSON;
 						cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person mode.");
 
 					}
 
 				}else if (args[1].equalsIgnoreCase("3") || args[1].equalsIgnoreCase("thirdpersonfront")) {
 
-					if (Spectate.getAPI().getSpectateAngle(cmdsender) == 3) {
+					if (Spectate.getAPI().getSpectateAngle(cmdsender) == SpectateAngle.THIRD_PERSON_FRONT) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in third person front mode.");
 						return true;
 
 					}else {
 
-						newAngle = 3;
+						newAngle = SpectateAngle.THIRD_PERSON_FRONT;
 						cmdsender.sendMessage(ChatColor.GRAY + "You are now in third person front mode.");
 
 					}
 
 				}else if (args[1].equalsIgnoreCase("4") || args[1].equalsIgnoreCase("freeroam")) {
 
-					if (Spectate.getAPI().getSpectateAngle(cmdsender) == 4) {
+					if (Spectate.getAPI().getSpectateAngle(cmdsender) == SpectateAngle.FREEROAM) {
 
 						cmdsender.sendMessage(ChatColor.RED + "Error: You are already in free roam mode.");
 						return true;
 
 					}else {
 
-						newAngle = 4;
+						newAngle = SpectateAngle.FREEROAM;
 						cmdsender.sendMessage(ChatColor.GRAY + "You are now in free roam mode.");
 
 					}

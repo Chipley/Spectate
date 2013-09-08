@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_6_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import com.Chipmunk9998.Spectate.PlayerState;
@@ -26,15 +27,21 @@ public class SpectateManager {
 	private HashMap<Player, ArrayList<Player>> spectators = new HashMap<Player, ArrayList<Player>>();
 	private HashMap<Player, Player> target = new HashMap<Player, Player>();
 
-	public ArrayList<String> isClick = new ArrayList<String>();
+	private ArrayList<String> isClick = new ArrayList<String>();
 
-	private HashMap<String, Integer> playerMode = new HashMap<String, Integer>();
-	private HashMap<String, Integer> playerAngle = new HashMap<String, Integer>();
-	
+	private HashMap<String, SpectateMode> playerMode = new HashMap<String, SpectateMode>();
+	private HashMap<String, SpectateAngle> playerAngle = new HashMap<String, SpectateAngle>();
+
 	private ArrayList<String> isScanning = new ArrayList<String>();
 	private HashMap<String, Integer> scanTask = new HashMap<String, Integer>();
 
 	private HashMap<Player, PlayerState> states = new HashMap<Player, PlayerState>();
+
+	public SpectateManager(Spectate plugin) {
+
+		this.plugin = plugin;
+
+	}
 
 	private void updateSpectators() {
 
@@ -46,7 +53,7 @@ public class SpectateManager {
 
 					if (isSpectating(p)) {
 
-						if (getSpectateAngle(p) == 1) {
+						if (getSpectateAngle(p) == SpectateAngle.FIRST_PERSON) {
 
 							if (roundTwoDecimals(p.getLocation().getX()) != roundTwoDecimals(getTarget(p).getLocation().getX()) || roundTwoDecimals(p.getLocation().getY()) != roundTwoDecimals(getTarget(p).getLocation().getY()) || roundTwoDecimals(p.getLocation().getZ()) != roundTwoDecimals(getTarget(p).getLocation().getZ()) || roundTwoDecimals(p.getLocation().getYaw()) != roundTwoDecimals(getTarget(p).getLocation().getYaw()) || roundTwoDecimals(p.getLocation().getPitch()) != roundTwoDecimals(getTarget(p).getLocation().getPitch())) {
 
@@ -56,7 +63,7 @@ public class SpectateManager {
 
 						}else {
 
-							if (getSpectateAngle(p) != 4) {
+							if (getSpectateAngle(p) != SpectateAngle.FREEROAM) {
 
 								p.teleport(getSpectateLocation(p));
 
@@ -76,9 +83,38 @@ public class SpectateManager {
 							p.setHealth(1);
 
 						}
-						
+
 						p.setLevel(getTarget(p).getLevel());
 						p.setExp(getTarget(p).getExp());
+
+						for (PotionEffect e : p.getActivePotionEffects()) {
+
+							boolean foundPotion = false;
+
+							for (PotionEffect e1 : getTarget(p).getActivePotionEffects()) {
+
+								if (e1.getType() == e.getType()) {
+
+									foundPotion = true;
+									break;
+
+								}
+
+							}
+
+							if (!foundPotion) {
+
+								p.removePotionEffect(e.getType());
+
+							}
+
+						}
+
+						for (PotionEffect e : getTarget(p).getActivePotionEffects()) {
+
+							p.addPotionEffect(e);
+
+						}
 
 						p.getInventory().setHeldItemSlot(getTarget(p).getInventory().getHeldItemSlot());
 
@@ -114,13 +150,13 @@ public class SpectateManager {
 	}
 
 	public void startSpectating(Player p, Player target, boolean saveState) {
-		
+
 		for (Player player1 : plugin.getServer().getOnlinePlayers()) {
 
 			player1.hidePlayer(p);
 
 		}
-		
+
 		p.teleport(target);
 
 		if (isSpectating(p)) {
@@ -130,9 +166,15 @@ public class SpectateManager {
 			removeSpectator(getTarget(p), p);
 
 		}else if (saveState) {
-			
+
 			savePlayerState(p);
-			
+
+		}
+
+		for (PotionEffect e : p.getActivePotionEffects()) {
+
+			p.removePotionEffect(e.getType());
+
 		}
 
 		setTarget(p, target);
@@ -140,7 +182,7 @@ public class SpectateManager {
 
 		String playerListName = p.getPlayerListName();
 
-		if (getSpectateAngle(p) == 1) {
+		if (getSpectateAngle(p) == SpectateAngle.FIRST_PERSON) {
 
 			p.hidePlayer(target);
 
@@ -154,7 +196,7 @@ public class SpectateManager {
 
 		p.setGameMode(target.getGameMode());
 		p.setFoodLevel(target.getFoodLevel());
-		
+
 		setExperienceCooldown(p, Integer.MAX_VALUE);
 
 		setSpectating(p, true);
@@ -170,11 +212,17 @@ public class SpectateManager {
 		setBeingSpectated(getTarget(p), false);
 
 		removeSpectator(getTarget(p), p);
-		
+
 		if (isScanning(p)) {
-			
+
 			stopScanning(p);
-			
+
+		}
+
+		for (PotionEffect e : p.getActivePotionEffects()) {
+
+			p.removePotionEffect(e.getType());
+
 		}
 
 		if (loadState) {
@@ -182,7 +230,7 @@ public class SpectateManager {
 			loadPlayerState(p);
 
 		}
-		
+
 		setExperienceCooldown(p, 0);
 
 		p.showPlayer(getTarget(p));
@@ -190,11 +238,6 @@ public class SpectateManager {
 	}
 
 	public boolean scrollRight(Player p, ArrayList<Player> playerList) {
-
-		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.RIGHT);
-		plugin.getServer().getPluginManager().callEvent(event);
-
-		playerList = event.getSpectateList();
 
 		playerList.remove(p);
 
@@ -223,11 +266,6 @@ public class SpectateManager {
 	}
 
 	public boolean scrollLeft(Player p, ArrayList<Player> playerList) {
-
-		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.LEFT);
-		plugin.getServer().getPluginManager().callEvent(event);
-
-		playerList = event.getSpectateList();
 
 		playerList.remove(p);
 
@@ -275,17 +313,25 @@ public class SpectateManager {
 
 	}
 
-	public void setSpectateMode(Player p, int newMode) {
+	public void setSpectateMode(Player p, SpectateMode newMode) {
 
-		playerMode.put(p.getName(), newMode);
+		if (newMode == SpectateMode.DEFAULT) {
+
+			playerMode.remove(p.getName());
+
+		}else {
+
+			playerMode.put(p.getName(), newMode);
+
+		}
 
 	}
 
-	public int getSpectateMode(Player p) {
+	public SpectateMode getSpectateMode(Player p) {
 
 		if (playerMode.get(p.getName()) == null) {
 
-			return 1;
+			return SpectateMode.DEFAULT;
 
 		}
 
@@ -293,11 +339,11 @@ public class SpectateManager {
 
 	}
 
-	public void setSpectateAngle(Player p, int newAngle) {
+	public void setSpectateAngle(Player p, SpectateAngle newAngle) {
 
 		if (isSpectating(p)) {
 
-			if (newAngle == 1) {
+			if (newAngle == SpectateAngle.FIRST_PERSON) {
 
 				p.hidePlayer(getTarget(p));
 
@@ -307,7 +353,7 @@ public class SpectateManager {
 
 			}
 
-			if (newAngle == 4) {
+			if (newAngle == SpectateAngle.FREEROAM) {
 
 				p.teleport(getTarget(p));
 
@@ -315,15 +361,23 @@ public class SpectateManager {
 
 		}
 
-		playerAngle.put(p.getName(), newAngle);
+		if (newAngle == SpectateAngle.FIRST_PERSON) {
+
+			playerAngle.remove(p.getName());
+
+		}else {
+
+			playerAngle.put(p.getName(), newAngle);
+
+		}
 
 	}
 
-	public int getSpectateAngle(Player p) {
+	public SpectateAngle getSpectateAngle(Player p) {
 
 		if (playerAngle.get(p.getName()) == null) {
 
-			return 1;
+			return SpectateAngle.FIRST_PERSON;
 
 		}
 
@@ -332,7 +386,7 @@ public class SpectateManager {
 	}
 
 	public void startScanning(final Player p, int interval) {
-		
+
 		isScanning.add(p.getName());
 
 		scanTask.put(p.getName(), plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
@@ -346,24 +400,24 @@ public class SpectateManager {
 		}, 0, 20 * interval));
 
 	}
-	
+
 	public void stopScanning(Player p) {
-		
+
 		plugin.getServer().getScheduler().cancelTask(scanTask.get(p.getName()));
 		isScanning.remove(p.getName());
-		
+
 	}
-	
+
 	public boolean isScanning(Player p) {
-		
+
 		if (isScanning.contains(p.getName())) {
-			
+
 			return true;
-			
+
 		}
-		
+
 		return false;
-		
+
 	}
 
 	public ArrayList<Player> getSpectateablePlayers() {
@@ -492,7 +546,7 @@ public class SpectateManager {
 
 	public ArrayList<Player> getSpectators(Player p) {
 
-		return spectators.get(p);
+		return (spectators.get(p) == null ? new ArrayList<Player>() : spectators.get(p));
 
 	}
 
@@ -568,11 +622,11 @@ public class SpectateManager {
 			Vector v = getTarget(p).getLocation().getDirection().normalize();
 			v.multiply(currentSubtraction);
 
-			if (getSpectateAngle(p) == 2) {
+			if (getSpectateAngle(p) == SpectateAngle.THIRD_PERSON) {
 
 				playerLoc.subtract(v);
 
-			}else if (getSpectateAngle(p) == 3) {
+			}else if (getSpectateAngle(p) == SpectateAngle.THIRD_PERSON_FRONT) {
 
 				playerLoc.add(v);
 
@@ -613,11 +667,11 @@ public class SpectateManager {
 		return states.get(p);
 
 	}
-	
+
 	//vanish them
 	//teleport to target
 	//save state
-	
+
 	//set spectating off
 	//restore inventory
 	//teleport them back to original location
@@ -638,7 +692,7 @@ public class SpectateManager {
 	public void loadPlayerState(Player fromState, Player toPlayer) {
 
 		PlayerState state = getPlayerState(fromState);
-		
+
 		toPlayer.getInventory().setContents(state.inventory);
 		toPlayer.getInventory().setArmorContents(state.armor);
 		toPlayer.setFoodLevel(state.hunger);
@@ -647,7 +701,7 @@ public class SpectateManager {
 		toPlayer.setExp(state.exp);
 		toPlayer.getInventory().setHeldItemSlot(state.slot);
 		toPlayer.setGameMode(state.mode);
-		
+
 		toPlayer.teleport(state.location);
 
 		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
@@ -657,6 +711,12 @@ public class SpectateManager {
 				onlinePlayers.showPlayer(fromState);
 
 			}
+
+		}
+
+		for (PotionEffect e : state.potions) {
+
+			toPlayer.addPotionEffect(e);
 
 		}
 
@@ -675,6 +735,12 @@ public class SpectateManager {
 		CraftPlayer craft = (CraftPlayer) p;
 		EntityPlayer entity = (EntityPlayer) craft.getHandle();
 		entity.bv = cooldown;
+
+	}
+
+	public boolean isReadyForNextScroll(Player p) {
+
+		return !isClick.contains(p.getName());
 
 	}
 

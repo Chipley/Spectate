@@ -16,7 +16,7 @@ public class Spectate extends JavaPlugin {
 	
 	public void onEnable() {
 		
-		Manager = new SpectateManager();
+		Manager = new SpectateManager(this);
 		
 		getServer().getPluginManager().registerEvents(new SpectateListener(), this);
 		getCommand("spectate").setExecutor(new SpectateCommandExecutor());

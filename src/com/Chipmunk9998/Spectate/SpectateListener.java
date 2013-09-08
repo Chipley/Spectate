@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.Chipmunk9998.Spectate.api.ScrollDirection;
+import com.Chipmunk9998.Spectate.api.SpectateMode;
 import com.Chipmunk9998.Spectate.api.SpectateScrollEvent;
 
 public class SpectateListener implements Listener {
@@ -58,12 +59,15 @@ public class SpectateListener implements Listener {
 
 			for (Player p : Spectate.getAPI().getSpectators(event.getPlayer())) {
 
-				if (Spectate.getAPI().getSpectateMode(p) == 2 || Spectate.getAPI().isScanning(p)) {
+				if (Spectate.getAPI().getSpectateMode(p) == SpectateMode.SCROLL || Spectate.getAPI().isScanning(p)) {
 
-					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, Spectate.getAPI().getSpectateablePlayers(), ScrollDirection.LEFT);
-					Bukkit.getServer().getPluginManager().callEvent(event);
+					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, Spectate.getAPI().getSpectateablePlayers(), ScrollDirection.RIGHT);
+					Bukkit.getServer().getPluginManager().callEvent(scrollEvent);
 
 					ArrayList<Player> playerList = scrollEvent.getSpectateList();
+					
+					playerList.remove(p);
+					playerList.remove(event.getPlayer());
 
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has disconnected.");
 
@@ -96,12 +100,15 @@ public class SpectateListener implements Listener {
 
 			for (Player p : Spectate.getAPI().getSpectators(event.getEntity())) {
 
-				if (Spectate.getAPI().getSpectateMode(p) == 2 || Spectate.getAPI().isScanning(p)) {
+				if (Spectate.getAPI().getSpectateMode(p) == SpectateMode.SCROLL || Spectate.getAPI().isScanning(p)) {
 
-					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, Spectate.getAPI().getSpectateablePlayers(), ScrollDirection.LEFT);
-					Bukkit.getServer().getPluginManager().callEvent(event);
+					SpectateScrollEvent scrollEvent = new SpectateScrollEvent(p, Spectate.getAPI().getSpectateablePlayers(), ScrollDirection.RIGHT);
+					Bukkit.getServer().getPluginManager().callEvent(scrollEvent);
 
 					ArrayList<Player> playerList = scrollEvent.getSpectateList();
+					
+					playerList.remove(p);
+					playerList.remove(event.getEntity());
 
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has died.");
 
@@ -169,9 +176,9 @@ public class SpectateListener implements Listener {
 
 		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
-			if (!Spectate.getAPI().isClick.contains(event.getPlayer().getName())) {
+			if (!Spectate.getAPI().isReadyForNextScroll(event.getPlayer())) {
 
-				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == 2) {
+				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == SpectateMode.SCROLL) {
 
 					if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
@@ -209,9 +216,9 @@ public class SpectateListener implements Listener {
 
 		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
-			if (!Spectate.getAPI().isClick.contains(event.getPlayer().getName())) {
+			if (!Spectate.getAPI().isReadyForNextScroll(event.getPlayer())) {
 
-				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == 2) {
+				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == SpectateMode.SCROLL) {
 
 					if (Bukkit.getServer().getOnlinePlayers().length > 2) {
 
