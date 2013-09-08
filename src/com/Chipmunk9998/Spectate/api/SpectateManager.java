@@ -150,13 +150,23 @@ public class SpectateManager {
 	}
 
 	public void startSpectating(Player p, Player target, boolean saveState) {
+		
+		if (!isSpectating(p)) {
+			
+			if (saveState) {
 
+				savePlayerState(p);
+
+			}
+			
+		}
+		
 		for (Player player1 : plugin.getServer().getOnlinePlayers()) {
 
 			player1.hidePlayer(p);
 
 		}
-
+		
 		p.teleport(target);
 
 		if (isSpectating(p)) {
@@ -164,10 +174,6 @@ public class SpectateManager {
 			setBeingSpectated(getTarget(p), false);
 			p.showPlayer(getTarget(p));
 			removeSpectator(getTarget(p), p);
-
-		}else if (saveState) {
-
-			savePlayerState(p);
 
 		}
 
@@ -239,6 +245,11 @@ public class SpectateManager {
 
 	public boolean scrollRight(Player p, ArrayList<Player> playerList) {
 
+		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.RIGHT);
+		plugin.getServer().getPluginManager().callEvent(event);
+
+		playerList = event.getSpectateList();
+
 		playerList.remove(p);
 
 		if (playerList.size() == 0) {
@@ -266,6 +277,11 @@ public class SpectateManager {
 	}
 
 	public boolean scrollLeft(Player p, ArrayList<Player> playerList) {
+
+		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.LEFT);
+		plugin.getServer().getPluginManager().callEvent(event);
+
+		playerList = event.getSpectateList();
 
 		playerList.remove(p);
 
