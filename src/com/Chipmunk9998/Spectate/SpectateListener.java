@@ -35,6 +35,14 @@ import com.Chipmunk9998.Spectate.api.SpectateMode;
 import com.Chipmunk9998.Spectate.api.SpectateScrollEvent;
 
 public class SpectateListener implements Listener {
+	
+	Spectate plugin;
+	
+	public SpectateListener(Spectate plugin) {
+		
+		this.plugin = plugin;
+		
+	}
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
@@ -430,7 +438,20 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onCommandPreprocess(PlayerCommandPreprocessEvent event) {
 
-		//check the option for disabling commands in the config and cancel it here if the command isn't /spectate
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
+
+			if (plugin.disable_commands) {
+
+				if (!event.getMessage().startsWith("/spectate") && !event.getMessage().startsWith("/spec")) {
+
+					event.setCancelled(true);
+					event.getPlayer().sendMessage(ChatColor.RED + "You can not execute this command while spectating.");
+
+				}
+
+			}
+
+		}
 
 	}
 

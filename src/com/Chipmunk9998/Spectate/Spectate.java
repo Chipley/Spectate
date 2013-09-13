@@ -25,7 +25,7 @@ public class Spectate extends JavaPlugin {
 		
 		loadConfig();
 		
-		getServer().getPluginManager().registerEvents(new SpectateListener(), this);
+		getServer().getPluginManager().registerEvents(new SpectateListener(this), this);
 		getCommand("spectate").setExecutor(new SpectateCommandExecutor(this));
 		getAPI().startSpectateTask();
 		
