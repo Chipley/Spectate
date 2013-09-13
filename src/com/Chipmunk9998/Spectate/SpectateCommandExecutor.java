@@ -22,30 +22,45 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
-		if (!(sender instanceof Player)) {
-
-			sender.sendMessage(ChatColor.RED + "You can't execute this command from the console.");
-			return true;
-
-		}
-
-		Player cmdsender = (Player) sender;
-
 		if (cmd.getName().equalsIgnoreCase("spectate")) {
 
-			if (args.length == 0) {
+			if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
 
-				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.on") && !cmdsender.hasPermission("spectate.off")) {
+				if (!sender.hasPermission("spectate.help") && !sender.hasPermission("spectate.on") && !sender.hasPermission("spectate.off")) {
 
-					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
+					sender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
 
 				}
 
-				showHelp(cmdsender);
+				showHelp(sender);
 				return true;
 
 			}
+			
+			if (args[0].equalsIgnoreCase("reload")) {
+				
+				if (!sender.isOp()) {
+					
+					sender.sendMessage(ChatColor.RED + "You do not have permission.");
+					return true;
+					
+				}
+				
+				plugin.loadConfig();
+				sender.sendMessage(ChatColor.GRAY + "Spectate config reloaded.");
+				return true;
+				
+			}
+			
+			if (!(sender instanceof Player)) {
+
+				sender.sendMessage(ChatColor.RED + "You can't execute this command from the console.");
+				return true;
+
+			}
+			
+			Player cmdsender = (Player) sender;
 
 			if (args[0].equalsIgnoreCase("off")) {
 
@@ -245,18 +260,6 @@ public class SpectateCommandExecutor implements CommandExecutor {
 				Spectate.getAPI().startScanning(cmdsender, interval);
 				return true;
 
-			}else if (args[0].equalsIgnoreCase("help")) {
-
-				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.on") && !cmdsender.hasPermission("spectate.off")) {
-
-					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
-					return true;
-
-				}
-
-				showHelp(cmdsender);
-				return true;
-
 			}
 
 			if (!cmdsender.hasPermission("spectate.on")) {
@@ -332,7 +335,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 	}
 
-	public void showHelp(Player cmdsender) {
+	public void showHelp(CommandSender cmdsender) {
 
 		cmdsender.sendMessage(ChatColor.RED + "Commands for Spectate:");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate [PlayerName]: " + ChatColor.GRAY + "Puts you into spectate mode and lets you see what the target sees.");
@@ -340,6 +343,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 		cmdsender.sendMessage(ChatColor.RED + "/spectate scan [interval] : " + ChatColor.GRAY + "Starts the scanning mode with the specified interval.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate mode [1 | default]: " + ChatColor.GRAY + "Puts you into the default spectate mode.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate mode [2 | scroll]: " + ChatColor.GRAY + "Puts you into scroll style mode with left click and right click controls.");
+		cmdsender.sendMessage(ChatColor.RED + "/spectate reload : " + ChatColor.GRAY + "Reloads the config.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate help : " + ChatColor.GRAY + "Shows this help page.");
 
 	}
