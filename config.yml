@@ -1,0 +1,8 @@
+######################################### Config Options #########################################
+
+# Enabling this permission stops spectators from spectating people with 
+# the "spectate.cantspectate" permission and the '*' permission. (OPs included)
+cantspectate-permission-enabled: false
+
+# Enabling this will stop spectators from executing any commands except '/spectate' while spectating.
+disable-commands-while-spectating: false

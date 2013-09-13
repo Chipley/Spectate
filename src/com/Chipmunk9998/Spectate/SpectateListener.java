@@ -65,14 +65,14 @@ public class SpectateListener implements Listener {
 					Bukkit.getServer().getPluginManager().callEvent(scrollEvent);
 
 					ArrayList<Player> playerList = scrollEvent.getSpectateList();
-					
+
 					playerList.remove(p);
 					playerList.remove(event.getPlayer());
 
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has disconnected.");
 
 					if (!Spectate.getAPI().scrollRight(p, playerList)) {
-						
+
 						Spectate.getAPI().stopSpectating(p, true);
 						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
 
@@ -106,14 +106,14 @@ public class SpectateListener implements Listener {
 					Bukkit.getServer().getPluginManager().callEvent(scrollEvent);
 
 					ArrayList<Player> playerList = scrollEvent.getSpectateList();
-					
+
 					playerList.remove(p);
 					playerList.remove(event.getEntity());
 
 					p.sendMessage(ChatColor.GRAY + "The person you were previously spectating has died.");
 
 					if (!Spectate.getAPI().scrollRight(p, playerList)) {
-						
+
 						Spectate.getAPI().stopSpectating(p, true);
 						p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because there is nobody left to spectate.");
 
@@ -346,7 +346,7 @@ public class SpectateListener implements Listener {
 		}
 
 	}
-	
+
 	@EventHandler
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 

@@ -11,6 +11,14 @@ import com.Chipmunk9998.Spectate.api.SpectateAngle;
 import com.Chipmunk9998.Spectate.api.SpectateMode;
 
 public class SpectateCommandExecutor implements CommandExecutor {
+	
+	Spectate plugin;
+	
+	public SpectateCommandExecutor(Spectate plugin) {
+		
+		this.plugin = plugin;
+		
+	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
@@ -27,7 +35,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			if (args.length == 0) {
 
-				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.use")) {
+				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.on") && !cmdsender.hasPermission("spectate.off")) {
 
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
@@ -41,7 +49,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			if (args[0].equalsIgnoreCase("off")) {
 
-				if (!cmdsender.hasPermission("spectate.use")) {
+				if (!cmdsender.hasPermission("spectate.off")) {
 
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
@@ -239,7 +247,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}else if (args[0].equalsIgnoreCase("help")) {
 
-				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.use")) {
+				if (!cmdsender.hasPermission("spectate.help") && !cmdsender.hasPermission("spectate.on") && !cmdsender.hasPermission("spectate.off")) {
 
 					cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 					return true;
@@ -251,7 +259,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}
 
-			if (!cmdsender.hasPermission("spectate.use")) {
+			if (!cmdsender.hasPermission("spectate.on")) {
 
 				cmdsender.sendMessage(ChatColor.RED + "You do not have permission.");
 				return true;
@@ -271,6 +279,17 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				cmdsender.sendMessage(ChatColor.GRAY + "Did you really just try to spectate yourself?");
 				return true;
+
+			}
+			
+			if (plugin.cantspectate_permission_enabled) {
+
+				if (targetPlayer.hasPermission("spectate.cantspectate")) {
+
+					cmdsender.sendMessage(ChatColor.GRAY + "This person can not be spectated.");
+					return true;
+
+				}
 
 			}
 

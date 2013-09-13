@@ -36,6 +36,7 @@ public class SpectateManager {
 	private HashMap<String, Integer> scanTask = new HashMap<String, Integer>();
 
 	private HashMap<Player, PlayerState> states = new HashMap<Player, PlayerState>();
+	private HashMap<Player, PlayerState> multiInvStates = new HashMap<Player, PlayerState>();
 
 	public SpectateManager(Spectate plugin) {
 
@@ -52,6 +53,18 @@ public class SpectateManager {
 				for (Player p : plugin.getServer().getOnlinePlayers()) {
 
 					if (isSpectating(p)) {
+
+						if (plugin.multiverseInvEnabled()) {
+
+							if (!p.getWorld().getName().equals(getTarget(p).getWorld().getName())) {
+
+								p.sendMessage(ChatColor.GRAY + "You were forced to stop spectating because the person you were spectating switched worlds.");
+								stopSpectating(p, true);
+								continue;
+
+							}
+
+						}
 
 						if (getSpectateAngle(p) == SpectateAngle.FIRST_PERSON) {
 
@@ -74,13 +87,22 @@ public class SpectateManager {
 						p.getInventory().setContents(getTarget(p).getInventory().getContents());
 						p.getInventory().setArmorContents(getTarget(p).getInventory().getArmorContents());
 
-						if (getTarget(p).getHealth() > 0) {
+						if (getTarget(p).getHealth() == 0) {
 
-							p.setHealth(getTarget(p).getHealth());
+							p.setHealth(1);
 
 						}else {
 
-							p.setHealth(1);
+							if (getTarget(p).getHealth() < p.getHealth()) {
+
+								double difference = p.getHealth() - getTarget(p).getHealth();
+								p.damage(difference);
+
+							}else if (getTarget(p).getHealth() > p.getHealth()) {
+								
+								p.setHealth(getTarget(p).getHealth());
+								
+							}
 
 						}
 
@@ -150,23 +172,58 @@ public class SpectateManager {
 	}
 
 	public void startSpectating(Player p, Player target, boolean saveState) {
-		
+
 		if (!isSpectating(p)) {
-			
+
 			if (saveState) {
 
 				savePlayerState(p);
 
 			}
-			
+
 		}
-		
+
+		boolean saveMultiInvState = false;
+
+		if (plugin.multiverseInvEnabled()) {
+
+			if (!p.getWorld().getName().equals(target.getWorld().getName())) {
+
+				saveMultiInvState = true;
+
+			}
+
+		}
+
 		for (Player player1 : plugin.getServer().getOnlinePlayers()) {
 
 			player1.hidePlayer(p);
 
 		}
+
+		if (saveMultiInvState) {
+
+			p.teleport(target.getWorld().getSpawnLocation());
+			multiInvStates.put(p, new PlayerState(p));
+
+		}
 		
+		String playerListName = p.getPlayerListName();
+
+		if (getSpectateAngle(p) == SpectateAngle.FIRST_PERSON) {
+
+			p.hidePlayer(target);
+
+		}else {
+
+			p.showPlayer(target);
+
+		}
+
+		p.setPlayerListName(playerListName);
+		
+		p.setHealth(target.getHealth());
+
 		p.teleport(target);
 
 		if (isSpectating(p)) {
@@ -185,20 +242,6 @@ public class SpectateManager {
 
 		setTarget(p, target);
 		addSpectator(target, p);
-
-		String playerListName = p.getPlayerListName();
-
-		if (getSpectateAngle(p) == SpectateAngle.FIRST_PERSON) {
-
-			p.hidePlayer(target);
-
-		}else {
-
-			p.showPlayer(target);
-
-		}
-
-		p.setPlayerListName(playerListName);
 
 		p.setGameMode(target.getGameMode());
 		p.setFoodLevel(target.getFoodLevel());
@@ -248,13 +291,31 @@ public class SpectateManager {
 		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.RIGHT);
 		plugin.getServer().getPluginManager().callEvent(event);
 
-		playerList = event.getSpectateList();
+		playerList = new ArrayList<Player>(event.getSpectateList());
 
 		playerList.remove(p);
 
 		if (playerList.size() == 0) {
 
 			return false;
+
+		}
+
+		if (plugin.multiverseInvEnabled()) {
+
+			if (isScanning(p)) {
+
+				for (Player players : event.getSpectateList()) {
+
+					if (!players.getWorld().getName().equals(p.getWorld().getName())) {
+
+						playerList.remove(players);
+
+					}
+
+				}
+
+			}
 
 		}
 
@@ -281,13 +342,31 @@ public class SpectateManager {
 		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.LEFT);
 		plugin.getServer().getPluginManager().callEvent(event);
 
-		playerList = event.getSpectateList();
+		playerList = new ArrayList<Player>(event.getSpectateList());
 
 		playerList.remove(p);
 
 		if (playerList.size() == 0) {
 
 			return false;
+
+		}
+
+		if (plugin.multiverseInvEnabled()) {
+
+			if (isScanning(p)) {
+
+				for (Player players : event.getSpectateList()) {
+
+					if (!players.getWorld().getName().equals(p.getWorld().getName())) {
+
+						playerList.remove(players);
+
+					}
+
+				}
+
+			}
 
 		}
 
@@ -454,9 +533,7 @@ public class SpectateManager {
 
 			}
 
-			/*
-
-			if (plugin.config.getBoolean("cantspectate Permission Enabled?")) {
+			if (plugin.cantspectate_permission_enabled) {
 
 				if (onlinePlayers.hasPermission("spectate.cantspectate")) {
 
@@ -465,8 +542,6 @@ public class SpectateManager {
 				}
 
 			}
-
-			 */
 
 			spectateablePlayers.add(onlinePlayers);
 
@@ -684,14 +759,6 @@ public class SpectateManager {
 
 	}
 
-	//vanish them
-	//teleport to target
-	//save state
-
-	//set spectating off
-	//restore inventory
-	//teleport them back to original location
-
 	public void savePlayerState(Player p) {
 
 		PlayerState playerstate = new PlayerState(p);
@@ -707,7 +774,21 @@ public class SpectateManager {
 
 	public void loadPlayerState(Player fromState, Player toPlayer) {
 
-		PlayerState state = getPlayerState(fromState);
+		if (plugin.multiverseInvEnabled() && multiInvStates.get(fromState) != null) {
+
+			loadFinalState(multiInvStates.get(fromState), toPlayer);
+			multiInvStates.remove(fromState);
+
+		}
+
+		loadFinalState(getPlayerState(fromState), toPlayer);
+		states.remove(fromState);
+
+	}
+
+	private void loadFinalState(PlayerState state, Player toPlayer) {
+
+		toPlayer.teleport(state.location);
 
 		toPlayer.getInventory().setContents(state.inventory);
 		toPlayer.getInventory().setArmorContents(state.armor);
@@ -718,13 +799,11 @@ public class SpectateManager {
 		toPlayer.getInventory().setHeldItemSlot(state.slot);
 		toPlayer.setGameMode(state.mode);
 
-		toPlayer.teleport(state.location);
-
 		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
 
-			if (!getVanishedFromList(fromState).contains(onlinePlayers)) {
+			if (!state.vanishedFrom.contains(onlinePlayers)) {
 
-				onlinePlayers.showPlayer(fromState);
+				onlinePlayers.showPlayer(toPlayer);
 
 			}
 
@@ -735,8 +814,6 @@ public class SpectateManager {
 			toPlayer.addPotionEffect(e);
 
 		}
-
-		states.remove(fromState);
 
 	}
 
