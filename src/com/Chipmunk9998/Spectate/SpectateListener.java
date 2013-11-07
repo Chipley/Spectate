@@ -193,7 +193,7 @@ public class SpectateListener implements Listener {
 						if (Bukkit.getServer().getOnlinePlayers().length > 2) {
 
 							Spectate.getAPI().scrollLeft(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
-							Spectate.getAPI().clickEnable(event.getPlayer());
+							Spectate.getAPI().disableScroll(event.getPlayer(), 5);
 
 						}
 
@@ -202,7 +202,7 @@ public class SpectateListener implements Listener {
 						if (Bukkit.getServer().getOnlinePlayers().length > 2) {
 
 							Spectate.getAPI().scrollRight(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
-							Spectate.getAPI().clickEnable(event.getPlayer());
+							Spectate.getAPI().disableScroll(event.getPlayer(), 5);
 
 						}
 
@@ -231,7 +231,7 @@ public class SpectateListener implements Listener {
 					if (Bukkit.getServer().getOnlinePlayers().length > 2) {
 
 						Spectate.getAPI().scrollRight(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
-						Spectate.getAPI().clickEnable(event.getPlayer());
+						Spectate.getAPI().disableScroll(event.getPlayer(), 5);
 
 					}
 

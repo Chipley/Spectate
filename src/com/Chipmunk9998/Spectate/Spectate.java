@@ -15,7 +15,7 @@ public class Spectate extends JavaPlugin {
 	
 	//TODO: (IN THE FUTURE - DON'T HAVE TIME FOR THIS RIGHT NOW) Control command
 	
-	static SpectateManager Manager;
+	private static SpectateManager Manager;
 	
 	public boolean cantspectate_permission_enabled = false;
 	public boolean disable_commands = false;
