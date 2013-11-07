@@ -20,6 +20,8 @@ public class PlayerState {
 	public int level;
 	public float exp;
 	public int slot;
+	public boolean allowFlight;
+	public boolean isFlying;
 	public GameMode mode;
 	public Location location;
 	
@@ -37,6 +39,8 @@ public class PlayerState {
 		level = p.getLevel();
 		exp = p.getExp();
 		slot = p.getInventory().getHeldItemSlot();
+		allowFlight = p.getAllowFlight();
+		isFlying = p.isFlying();
 		mode = p.getGameMode();
 		location = p.getLocation();
 		

@@ -99,9 +99,9 @@ public class SpectateManager {
 								p.damage(difference);
 
 							}else if (getTarget(p).getHealth() > p.getHealth()) {
-								
+
 								p.setHealth(getTarget(p).getHealth());
-								
+
 							}
 
 						}
@@ -139,6 +139,16 @@ public class SpectateManager {
 						}
 
 						p.getInventory().setHeldItemSlot(getTarget(p).getInventory().getHeldItemSlot());
+
+						if (getTarget(p).isFlying()) {
+
+							if (!p.isFlying()) {
+
+								p.setFlying(true);
+
+							}
+
+						}
 
 					}
 
@@ -207,7 +217,7 @@ public class SpectateManager {
 			multiInvStates.put(p, new PlayerState(p));
 
 		}
-		
+
 		String playerListName = p.getPlayerListName();
 
 		if (getSpectateAngle(p) == SpectateAngle.FIRST_PERSON) {
@@ -221,7 +231,7 @@ public class SpectateManager {
 		}
 
 		p.setPlayerListName(playerListName);
-		
+
 		p.setHealth(target.getHealth());
 
 		p.teleport(target);
@@ -247,6 +257,7 @@ public class SpectateManager {
 		p.setFoodLevel(target.getFoodLevel());
 
 		setExperienceCooldown(p, Integer.MAX_VALUE);
+		p.setAllowFlight(true);
 
 		setSpectating(p, true);
 		setBeingSpectated(target, true);
@@ -679,7 +690,7 @@ public class SpectateManager {
 
 	}
 
-	public void clickEnable(final Player player) {
+	public void disableScroll(final Player player, long ticks) {
 
 		if (!isClick.contains(player.getName())) {
 
@@ -693,13 +704,19 @@ public class SpectateManager {
 
 				}
 
-			}, 5L);
+			}, ticks);
 
 		}
 
 	}
 
 	public Location getSpectateLocation(Player p) {
+		
+		if (getSpectateAngle(p) == SpectateAngle.FIRST_PERSON) {
+			
+			return (getTarget(p).getLocation());
+			
+		}
 
 		Location playerLoc = getTarget(p).getLocation();
 
@@ -797,6 +814,8 @@ public class SpectateManager {
 		toPlayer.setLevel(state.level);
 		toPlayer.setExp(state.exp);
 		toPlayer.getInventory().setHeldItemSlot(state.slot);
+		toPlayer.setAllowFlight(state.allowFlight);
+		toPlayer.setFlying(state.isFlying);
 		toPlayer.setGameMode(state.mode);
 
 		for (Player onlinePlayers : plugin.getServer().getOnlinePlayers()) {
