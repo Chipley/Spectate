@@ -1,21 +1,19 @@
 package com.Chipmunk9998.Spectate.api;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import net.minecraft.server.v1_6_R3.EntityPlayer;
-
+import com.Chipmunk9998.Spectate.PlayerState;
+import com.Chipmunk9998.Spectate.Spectate;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_6_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
-import com.Chipmunk9998.Spectate.PlayerState;
-import com.Chipmunk9998.Spectate.Spectate;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SpectateManager {
 
@@ -844,9 +842,19 @@ public class SpectateManager {
 
 	public void setExperienceCooldown(Player p, int cooldown) {
 
-		CraftPlayer craft = (CraftPlayer) p;
-		EntityPlayer entity = (EntityPlayer) craft.getHandle();
-		entity.bv = cooldown;
+        try {
+
+            Method handle = p.getClass().getDeclaredMethod("getHandle");
+            Object entityPlayer = handle.invoke(p);
+            Field cooldownField = entityPlayer.getClass().getDeclaredField("bv");
+            cooldownField.setAccessible(true);
+            cooldownField.setInt(entityPlayer, cooldown);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
 
 	}
 
