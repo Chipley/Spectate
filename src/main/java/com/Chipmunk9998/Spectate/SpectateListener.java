@@ -1,7 +1,8 @@
 package com.Chipmunk9998.Spectate;
 
-import java.util.ArrayList;
-
+import com.Chipmunk9998.Spectate.api.ScrollDirection;
+import com.Chipmunk9998.Spectate.api.SpectateMode;
+import com.Chipmunk9998.Spectate.api.SpectateScrollEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Monster;
@@ -12,27 +13,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 
-import com.Chipmunk9998.Spectate.api.ScrollDirection;
-import com.Chipmunk9998.Spectate.api.SpectateMode;
-import com.Chipmunk9998.Spectate.api.SpectateScrollEvent;
+import java.util.ArrayList;
 
 public class SpectateListener implements Listener {
 	
@@ -61,9 +48,8 @@ public class SpectateListener implements Listener {
 		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
 
 			Spectate.getAPI().stopSpectating(event.getPlayer(), true);
-			return;
 
-		}else if (Spectate.getAPI().isBeingSpectated(event.getPlayer())) {
+        }else if (Spectate.getAPI().isBeingSpectated(event.getPlayer())) {
 
 			for (Player p : Spectate.getAPI().getSpectators(event.getPlayer())) {
 
@@ -95,9 +81,7 @@ public class SpectateListener implements Listener {
 
 			}
 
-			return;
-
-		}
+        }
 
 	}
 
@@ -136,9 +120,7 @@ public class SpectateListener implements Listener {
 
 			}
 
-			return;
-
-		}
+        }
 
 	}
 
@@ -173,9 +155,8 @@ public class SpectateListener implements Listener {
 		if (Spectate.getAPI().isSpectating(p)) {
 
 			event.setCancelled(true);
-			return;
 
-		}
+        }
 
 	}
 
@@ -213,9 +194,8 @@ public class SpectateListener implements Listener {
 			}
 
 			event.setCancelled(true);
-			return;
 
-		}
+        }
 
 	}
 
@@ -240,9 +220,8 @@ public class SpectateListener implements Listener {
 			}
 
 			event.setCancelled(true);
-			return;
 
-		}
+        }
 
 	}
 

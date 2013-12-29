@@ -152,7 +152,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				SpectateAngle newAngle = SpectateAngle.FIRST_PERSON;
+				SpectateAngle newAngle;
 
 				if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("firstperson")) {
 
@@ -243,7 +243,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				int interval = 0;
+				int interval;
 
 				try {
 
@@ -278,7 +278,7 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}
 
-			if (cmdsender.getName() == targetPlayer.getName()) {
+			if (cmdsender.getName().equals(targetPlayer.getName())) {
 
 				cmdsender.sendMessage(ChatColor.GRAY + "Did you really just try to spectate yourself?");
 				return true;

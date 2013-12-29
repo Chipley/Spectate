@@ -328,7 +328,7 @@ public class SpectateManager {
 
 		}
 
-		int scrollToIndex = 1;
+		int scrollToIndex;
 
 		if (getScrollNumber(p, playerList) == playerList.size()) {
 
@@ -379,7 +379,7 @@ public class SpectateManager {
 
 		}
 
-		int scrollToIndex = 1;
+		int scrollToIndex;
 
 		if (getScrollNumber(p, playerList) == 1) {
 
@@ -514,15 +514,9 @@ public class SpectateManager {
 
 	public boolean isScanning(Player p) {
 
-		if (isScanning.contains(p.getName())) {
+        return isScanning.contains(p.getName());
 
-			return true;
-
-		}
-
-		return false;
-
-	}
+    }
 
 	public ArrayList<Player> getSpectateablePlayers() {
 
@@ -536,7 +530,7 @@ public class SpectateManager {
 
 			}
 
-			if (isSpectating.contains(onlinePlayers.getName())) {
+			if (isSpectating.contains(onlinePlayers)) {
 
 				continue;
 
@@ -624,11 +618,7 @@ public class SpectateManager {
 
 	private void removeSpectator(Player p, Player spectator) {
 
-		if (spectators.get(p) == null) {
-
-			return;
-
-		}else {
+        if (spectators.get(p) != null) {
 
 			if (spectators.get(p).size() == 1) {
 
@@ -642,7 +632,7 @@ public class SpectateManager {
 
 		}
 
-	}
+    }
 
 	public ArrayList<Player> getSpectators(Player p) {
 
