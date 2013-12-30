@@ -836,7 +836,7 @@ public class SpectateManager {
 
             Method handle = p.getClass().getDeclaredMethod("getHandle");
             Object entityPlayer = handle.invoke(p);
-            Field cooldownField = entityPlayer.getClass().getDeclaredField("bv");
+            Field cooldownField = entityPlayer.getClass().getSuperclass().getDeclaredField("bu");
             cooldownField.setAccessible(true);
             cooldownField.setInt(entityPlayer, cooldown);
 
