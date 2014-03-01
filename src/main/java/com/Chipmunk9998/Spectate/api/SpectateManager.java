@@ -1,21 +1,19 @@
 package com.Chipmunk9998.Spectate.api;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import net.minecraft.server.v1_6_R3.EntityPlayer;
-
+import com.Chipmunk9998.Spectate.PlayerState;
+import com.Chipmunk9998.Spectate.Spectate;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_6_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
-import com.Chipmunk9998.Spectate.PlayerState;
-import com.Chipmunk9998.Spectate.Spectate;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SpectateManager {
 
@@ -330,7 +328,7 @@ public class SpectateManager {
 
 		}
 
-		int scrollToIndex = 1;
+		int scrollToIndex;
 
 		if (getScrollNumber(p, playerList) == playerList.size()) {
 
@@ -381,7 +379,7 @@ public class SpectateManager {
 
 		}
 
-		int scrollToIndex = 1;
+		int scrollToIndex;
 
 		if (getScrollNumber(p, playerList) == 1) {
 
@@ -516,15 +514,9 @@ public class SpectateManager {
 
 	public boolean isScanning(Player p) {
 
-		if (isScanning.contains(p.getName())) {
+        return isScanning.contains(p.getName());
 
-			return true;
-
-		}
-
-		return false;
-
-	}
+    }
 
 	public ArrayList<Player> getSpectateablePlayers() {
 
@@ -538,7 +530,7 @@ public class SpectateManager {
 
 			}
 
-			if (isSpectating.contains(onlinePlayers.getName())) {
+			if (isSpectating.contains(onlinePlayers)) {
 
 				continue;
 
@@ -626,11 +618,7 @@ public class SpectateManager {
 
 	private void removeSpectator(Player p, Player spectator) {
 
-		if (spectators.get(p) == null) {
-
-			return;
-
-		}else {
+        if (spectators.get(p) != null) {
 
 			if (spectators.get(p).size() == 1) {
 
@@ -644,7 +632,7 @@ public class SpectateManager {
 
 		}
 
-	}
+    }
 
 	public ArrayList<Player> getSpectators(Player p) {
 
@@ -844,9 +832,19 @@ public class SpectateManager {
 
 	public void setExperienceCooldown(Player p, int cooldown) {
 
-		CraftPlayer craft = (CraftPlayer) p;
-		EntityPlayer entity = (EntityPlayer) craft.getHandle();
-		entity.bv = cooldown;
+        try {
+
+            Method handle = p.getClass().getDeclaredMethod("getHandle");
+            Object entityPlayer = handle.invoke(p);
+            Field cooldownField = entityPlayer.getClass().getSuperclass().getDeclaredField("bu");
+            cooldownField.setAccessible(true);
+            cooldownField.setInt(entityPlayer, cooldown);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
 
 	}
 

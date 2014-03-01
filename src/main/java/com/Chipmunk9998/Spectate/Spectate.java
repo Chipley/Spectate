@@ -1,15 +1,14 @@
 package com.Chipmunk9998.Spectate;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.Chipmunk9998.Spectate.api.SpectateManager;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.Chipmunk9998.Spectate.api.SpectateManager;
+import java.io.File;
+import java.io.IOException;
 
 public class Spectate extends JavaPlugin {
 	
@@ -104,16 +103,10 @@ public class Spectate extends JavaPlugin {
 	}
 	
 	public boolean multiverseInvEnabled() {
-		
-		if (getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null && getServer().getPluginManager().getPlugin("Multiverse-Inventories").isEnabled()) {
-			
-			return true;
-			
-		}
-		
-		return false;
-		
-	}
+
+        return getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null && getServer().getPluginManager().getPlugin("Multiverse-Inventories").isEnabled();
+
+    }
 	
 	public void loadConfig() {
 
