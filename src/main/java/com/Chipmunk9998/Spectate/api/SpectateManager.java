@@ -35,6 +35,8 @@ public class SpectateManager {
 
 	private HashMap<Player, PlayerState> states = new HashMap<Player, PlayerState>();
 	private HashMap<Player, PlayerState> multiInvStates = new HashMap<Player, PlayerState>();
+	
+	private ArrayList<String> inventoryOff = new ArrayList<String>();
 
 	public SpectateManager(Spectate plugin) {
 
@@ -81,9 +83,11 @@ public class SpectateManager {
 							}
 
 						}
-
-						p.getInventory().setContents(getTarget(p).getInventory().getContents());
-						p.getInventory().setArmorContents(getTarget(p).getInventory().getArmorContents());
+						
+						if (!inventoryOff.contains(p.getName())) {
+						    p.getInventory().setContents(getTarget(p).getInventory().getContents());
+						    p.getInventory().setArmorContents(getTarget(p).getInventory().getArmorContents());
+						}
 
 						if (getTarget(p).getHealth() == 0) {
 
@@ -135,8 +139,10 @@ public class SpectateManager {
 							p.addPotionEffect(e);
 
 						}
-
-						p.getInventory().setHeldItemSlot(getTarget(p).getInventory().getHeldItemSlot());
+						
+						if (!inventoryOff.contains(p.getName())) {
+						    p.getInventory().setHeldItemSlot(getTarget(p).getInventory().getHeldItemSlot());
+						}
 
 						if (getTarget(p).isFlying()) {
 
@@ -676,6 +682,18 @@ public class SpectateManager {
 
 		}
 
+	}
+	
+	public void setModifyInventory(Player p, boolean modify) {
+	    if (modify) {
+	        if (inventoryOff.contains(p.getName())) {
+	            inventoryOff.remove(p.getName());
+	        }
+	    } else {
+	        if (!inventoryOff.contains(p.getName())) {
+	            inventoryOff.add(p.getName());
+	        }
+	    }
 	}
 
 	public void disableScroll(final Player player, long ticks) {
