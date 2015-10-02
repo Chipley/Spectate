@@ -1,6 +1,7 @@
 package com.Chipmunk9998.Spectate;
 
 import com.Chipmunk9998.Spectate.api.SpectateManager;
+
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -13,7 +14,19 @@ import java.io.IOException;
 public class Spectate extends JavaPlugin {
 	
 	//TODO: (IN THE FUTURE - DON'T HAVE TIME FOR THIS RIGHT NOW) Control command
-	
+    
+    /* Submit this to spigot in the CraftPlayer class \/
+    if (!this.getHandle().activeContainer.a(this.getHandle())) {
+        if (getHandle().activeContainer != this.getHandle().defaultContainer) {
+            this.getHandle().closeInventory();
+        }
+    }
+    */
+    
+    //TODO: Figure out why the crafting bench behaves weird and make a pull request for that too
+    
+    //TODO: Fix projectiles launched by a player getting stopped by the spectator
+    
 	private static SpectateManager Manager;
 	
 	public boolean cantspectate_permission_enabled = false;

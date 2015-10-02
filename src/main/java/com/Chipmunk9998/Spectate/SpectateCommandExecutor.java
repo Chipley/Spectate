@@ -229,13 +229,6 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 				}
 
-				if (Spectate.getAPI().isScanning(cmdsender)) {
-
-					cmdsender.sendMessage(ChatColor.RED + "You are already scanning.");
-					return true;
-
-				}
-
 				if (args.length < 2) {
 
 					cmdsender.sendMessage(ChatColor.RED + "Error: You must enter in an interval.");
@@ -255,8 +248,17 @@ public class SpectateCommandExecutor implements CommandExecutor {
 					return true;
 
 				}
+				
+				if (Spectate.getAPI().isScanning(cmdsender)) {
+					Spectate.getAPI().stopScanning(cmdsender);
+				}
 
-				Spectate.getAPI().savePlayerState(cmdsender);
+				if (!Spectate.getAPI().isSpectating(cmdsender)) {
+					Spectate.getAPI().savePlayerState(cmdsender);
+				}
+				
+				cmdsender.sendMessage(ChatColor.GRAY + "You are now scanning every " + interval + " seconds.");
+				
 				Spectate.getAPI().startScanning(cmdsender, interval);
 				return true;
 
@@ -321,7 +323,19 @@ public class SpectateCommandExecutor implements CommandExecutor {
 
 			}
 
-			Spectate.getAPI().startSpectating(cmdsender, Bukkit.getServer().getPlayer(args[0]), true);
+			if (plugin.multiverseInvEnabled() && !cmdsender.getWorld().getName().equals(targetPlayer.getWorld().getName())) {
+				if (Spectate.getAPI().isSpectating(cmdsender)) {
+					Spectate.getAPI().stopSpectating(cmdsender, true);
+				}
+				Spectate.getAPI().savePlayerState(cmdsender);
+				Spectate.getAPI().saveMultiInvState(cmdsender, targetPlayer);
+			} else {
+				if (!Spectate.getAPI().isSpectating(cmdsender)) {
+					Spectate.getAPI().savePlayerState(cmdsender);
+				}
+			}
+
+			Spectate.getAPI().startSpectating(cmdsender, targetPlayer);
 
 			return true;
 
@@ -338,11 +352,11 @@ public class SpectateCommandExecutor implements CommandExecutor {
 	public void showHelp(CommandSender cmdsender) {
 
 		cmdsender.sendMessage(ChatColor.RED + "Commands for Spectate:");
-		cmdsender.sendMessage(ChatColor.RED + "/spectate [PlayerName]: " + ChatColor.GRAY + "Puts you into spectate mode and lets you see what the target sees.");
+		cmdsender.sendMessage(ChatColor.RED + "/spectate [PlayerName] : " + ChatColor.GRAY + "Puts you into spectate mode and lets you see what the target sees.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate off : " + ChatColor.GRAY + "Takes you out of spectate mode.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate scan [interval] : " + ChatColor.GRAY + "Starts the scanning mode with the specified interval.");
-		cmdsender.sendMessage(ChatColor.RED + "/spectate mode [1 | default]: " + ChatColor.GRAY + "Puts you into the default spectate mode.");
-		cmdsender.sendMessage(ChatColor.RED + "/spectate mode [2 | scroll]: " + ChatColor.GRAY + "Puts you into scroll style mode with left click and right click controls.");
+		cmdsender.sendMessage(ChatColor.RED + "/spectate mode [1 | default] : " + ChatColor.GRAY + "Puts you into the default spectate mode.");
+		cmdsender.sendMessage(ChatColor.RED + "/spectate mode [2 | scroll] : " + ChatColor.GRAY + "Puts you into scroll style mode with left click and right click controls.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate reload : " + ChatColor.GRAY + "Reloads the config.");
 		cmdsender.sendMessage(ChatColor.RED + "/spectate help : " + ChatColor.GRAY + "Shows this help page.");
 

@@ -2,15 +2,22 @@ package com.Chipmunk9998.Spectate.api;
 
 import com.Chipmunk9998.Spectate.PlayerState;
 import com.Chipmunk9998.Spectate.Spectate;
+
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.WorldServer;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,17 +27,14 @@ public class SpectateManager {
 	private Spectate plugin;
 	private int spectateTask = -1;
 
-	private ArrayList<Player> isSpectating = new ArrayList<Player>();
-	private ArrayList<Player> isBeingSpectated = new ArrayList<Player>();
 	private HashMap<Player, ArrayList<Player>> spectators = new HashMap<Player, ArrayList<Player>>();
 	private HashMap<Player, Player> target = new HashMap<Player, Player>();
 
-	private ArrayList<String> isClick = new ArrayList<String>();
+	private ArrayList<String> cantClick = new ArrayList<String>();
 
 	private HashMap<String, SpectateMode> playerMode = new HashMap<String, SpectateMode>();
 	private HashMap<String, SpectateAngle> playerAngle = new HashMap<String, SpectateAngle>();
 
-	private ArrayList<String> isScanning = new ArrayList<String>();
 	private HashMap<String, Integer> scanTask = new HashMap<String, Integer>();
 
 	private HashMap<Player, PlayerState> states = new HashMap<Player, PlayerState>();
@@ -70,7 +74,7 @@ public class SpectateManager {
 
 							if (roundTwoDecimals(p.getLocation().getX()) != roundTwoDecimals(getTarget(p).getLocation().getX()) || roundTwoDecimals(p.getLocation().getY()) != roundTwoDecimals(getTarget(p).getLocation().getY()) || roundTwoDecimals(p.getLocation().getZ()) != roundTwoDecimals(getTarget(p).getLocation().getZ()) || roundTwoDecimals(p.getLocation().getYaw()) != roundTwoDecimals(getTarget(p).getLocation().getYaw()) || roundTwoDecimals(p.getLocation().getPitch()) != roundTwoDecimals(getTarget(p).getLocation().getPitch())) {
 
-								p.teleport(getTarget(p));
+								teleport(p, getTarget(p));
 
 							}
 
@@ -78,15 +82,16 @@ public class SpectateManager {
 
 							if (getSpectateAngle(p) != SpectateAngle.FREEROAM) {
 
-								p.teleport(getSpectateLocation(p));
+								teleport(p, getSpectateLocation(p));
 
 							}
 
 						}
 						
 						if (!inventoryOff.contains(p.getName())) {
-						    p.getInventory().setContents(getTarget(p).getInventory().getContents());
-						    p.getInventory().setArmorContents(getTarget(p).getInventory().getArmorContents());
+							p.getInventory().setContents(getTarget(p).getInventory().getContents());
+							p.getInventory().setArmorContents(getTarget(p).getInventory().getArmorContents());
+							p.setItemOnCursor(getTarget(p).getItemOnCursor());
 						}
 
 						if (getTarget(p).getHealth() == 0) {
@@ -141,7 +146,7 @@ public class SpectateManager {
 						}
 						
 						if (!inventoryOff.contains(p.getName())) {
-						    p.getInventory().setHeldItemSlot(getTarget(p).getInventory().getHeldItemSlot());
+							p.getInventory().setHeldItemSlot(getTarget(p).getInventory().getHeldItemSlot());
 						}
 
 						if (getTarget(p).isFlying()) {
@@ -186,28 +191,13 @@ public class SpectateManager {
 	}
 
 	public void startSpectating(Player p, Player target, boolean saveState) {
-
-		if (!isSpectating(p)) {
-
-			if (saveState) {
-
-				savePlayerState(p);
-
-			}
-
+		if (saveState) {
+			savePlayerState(p);
 		}
+		startSpectating(p, target);
+	}
 
-		boolean saveMultiInvState = false;
-
-		if (plugin.multiverseInvEnabled()) {
-
-			if (!p.getWorld().getName().equals(target.getWorld().getName())) {
-
-				saveMultiInvState = true;
-
-			}
-
-		}
+	public void startSpectating(Player p, Player target) {
 
 		for (Player player1 : plugin.getServer().getOnlinePlayers()) {
 
@@ -215,14 +205,14 @@ public class SpectateManager {
 
 		}
 
-		if (saveMultiInvState) {
+		String playerListName = p.getPlayerListName();
+		
+		if (isSpectating(p)) {
 
-			p.teleport(target.getWorld().getSpawnLocation());
-			multiInvStates.put(p, new PlayerState(p));
+			p.showPlayer(getTarget(p));
+			removeSpectator(getTarget(p), p);
 
 		}
-
-		String playerListName = p.getPlayerListName();
 
 		if (getSpectateAngle(p) == SpectateAngle.FIRST_PERSON) {
 
@@ -240,14 +230,6 @@ public class SpectateManager {
 
 		p.teleport(target);
 
-		if (isSpectating(p)) {
-
-			setBeingSpectated(getTarget(p), false);
-			p.showPlayer(getTarget(p));
-			removeSpectator(getTarget(p), p);
-
-		}
-
 		for (PotionEffect e : p.getActivePotionEffects()) {
 
 			p.removePotionEffect(e.getType());
@@ -260,20 +242,13 @@ public class SpectateManager {
 		p.setGameMode(target.getGameMode());
 		p.setFoodLevel(target.getFoodLevel());
 
-		setExperienceCooldown(p, Integer.MAX_VALUE);
 		p.setAllowFlight(true);
-
-		setSpectating(p, true);
-		setBeingSpectated(target, true);
 
 		p.sendMessage(ChatColor.GRAY + "You are now spectating " + target.getName() + ".");
 
 	}
 
 	public void stopSpectating(Player p, boolean loadState) {
-
-		setSpectating(p, false);
-		setBeingSpectated(getTarget(p), false);
 
 		removeSpectator(getTarget(p), p);
 
@@ -295,112 +270,58 @@ public class SpectateManager {
 
 		}
 
-		setExperienceCooldown(p, 0);
+		p.setItemOnCursor(null);
 
 		p.showPlayer(getTarget(p));
 
+		target.remove(p);
+	}
+
+
+	public boolean scrollLeft(Player p, ArrayList<Player> playerList) {
+		return scrollInDirection(p, playerList, ScrollDirection.LEFT);
 	}
 
 	public boolean scrollRight(Player p, ArrayList<Player> playerList) {
-
-		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.RIGHT);
-		plugin.getServer().getPluginManager().callEvent(event);
-
-		playerList = new ArrayList<Player>(event.getSpectateList());
-
-		playerList.remove(p);
-
-		if (playerList.size() == 0) {
-
-			return false;
-
-		}
-
-		if (plugin.multiverseInvEnabled()) {
-
-			if (isScanning(p)) {
-
-				for (Player players : event.getSpectateList()) {
-
-					if (!players.getWorld().getName().equals(p.getWorld().getName())) {
-
-						playerList.remove(players);
-
-					}
-
-				}
-
-			}
-
-		}
-
-		int scrollToIndex;
-
-		if (getScrollNumber(p, playerList) == playerList.size()) {
-
-			scrollToIndex = 1;
-
-		}else {
-
-			scrollToIndex = getScrollNumber(p, playerList) + 1;
-
-		}
-
-		startSpectating(p, playerList.get(scrollToIndex - 1), false);
-
-		return true;
-
+		return scrollInDirection(p, playerList, ScrollDirection.RIGHT);
 	}
 
-	public boolean scrollLeft(Player p, ArrayList<Player> playerList) {
-
-		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, ScrollDirection.LEFT);
+	private boolean scrollInDirection(Player p, ArrayList<Player> playerList, ScrollDirection direction) {
+		SpectateScrollEvent event = new SpectateScrollEvent(p, playerList, direction);
 		plugin.getServer().getPluginManager().callEvent(event);
-
 		playerList = new ArrayList<Player>(event.getSpectateList());
-
 		playerList.remove(p);
-
 		if (playerList.size() == 0) {
-
 			return false;
-
 		}
-
 		if (plugin.multiverseInvEnabled()) {
-
 			if (isScanning(p)) {
-
 				for (Player players : event.getSpectateList()) {
-
 					if (!players.getWorld().getName().equals(p.getWorld().getName())) {
-
 						playerList.remove(players);
-
 					}
-
 				}
-
 			}
-
 		}
-
-		int scrollToIndex;
-
-		if (getScrollNumber(p, playerList) == 1) {
-
-			scrollToIndex = playerList.size();
-
-		}else {
-
-			scrollToIndex = getScrollNumber(p, playerList) - 1;
-
+		int scrollToIndex = 0;
+		if (direction == ScrollDirection.LEFT) {
+			if (getScrollNumber(p, playerList) == 1) {
+				scrollToIndex = playerList.size();
+			} else {
+				scrollToIndex = getScrollNumber(p, playerList) - 1;
+			}
+		} else if (direction == ScrollDirection.RIGHT) {
+			if (getScrollNumber(p, playerList) == playerList.size()) {
+				scrollToIndex = 1;
+			} else {
+				scrollToIndex = getScrollNumber(p, playerList) + 1;
+			}
 		}
-
-		startSpectating(p, playerList.get(scrollToIndex - 1), false);
-
+		Player target = playerList.get(scrollToIndex - 1);
+		if (!target.getName().equals(getTarget(p).getName())) {
+			startSpectating(p, target);
+		}
 		return true;
-
 	}
 
 	public int getScrollNumber(Player p, ArrayList<Player> playerList) {
@@ -497,8 +418,6 @@ public class SpectateManager {
 
 	public void startScanning(final Player p, int interval) {
 
-		isScanning.add(p.getName());
-
 		scanTask.put(p.getName(), plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
 			public void run() {
@@ -514,13 +433,13 @@ public class SpectateManager {
 	public void stopScanning(Player p) {
 
 		plugin.getServer().getScheduler().cancelTask(scanTask.get(p.getName()));
-		isScanning.remove(p.getName());
+		scanTask.remove(p.getName());
 
 	}
 
 	public boolean isScanning(Player p) {
 
-        return isScanning.contains(p.getName());
+		return scanTask.containsKey(p.getName());
 
     }
 
@@ -536,7 +455,7 @@ public class SpectateManager {
 
 			}
 
-			if (isSpectating.contains(onlinePlayers)) {
+			if (isSpectating(onlinePlayers)) {
 
 				continue;
 
@@ -574,33 +493,13 @@ public class SpectateManager {
 
 	public boolean isSpectating(Player p) {
 
-		return isSpectating.contains(p);
+		return target.containsKey(p);
 
 	}
 
 	public boolean isBeingSpectated(Player p) {
 
-		return isBeingSpectated.contains(p);
-
-	}
-
-	private void setBeingSpectated(Player p, boolean beingSpectated) {
-
-		if (beingSpectated) {
-
-			if (isBeingSpectated.contains(p)) {
-
-				return;
-
-			}
-
-			isBeingSpectated.add(p);
-
-		}else {
-
-			isBeingSpectated.remove(p);
-
-		}
+		return spectators.containsKey(p);
 
 	}
 
@@ -664,49 +563,29 @@ public class SpectateManager {
 
 	}
 
-	private void setSpectating(Player p, boolean spectating) {
-
-		if (spectating) {
-
-			if (isSpectating.contains(p)) {
-
-				return;
-
-			}
-
-			isSpectating.add(p);
-
-		}else {
-
-			isSpectating.remove(p);
-
-		}
-
-	}
-	
 	public void setModifyInventory(Player p, boolean modify) {
-	    if (modify) {
-	        if (inventoryOff.contains(p.getName())) {
-	            inventoryOff.remove(p.getName());
-	        }
-	    } else {
-	        if (!inventoryOff.contains(p.getName())) {
-	            inventoryOff.add(p.getName());
-	        }
-	    }
+		if (modify) {
+			if (inventoryOff.contains(p.getName())) {
+				inventoryOff.remove(p.getName());
+			}
+		} else {
+			if (!inventoryOff.contains(p.getName())) {
+				inventoryOff.add(p.getName());
+			}
+		}
 	}
 
 	public void disableScroll(final Player player, long ticks) {
 
-		if (!isClick.contains(player.getName())) {
+		if (!cantClick.contains(player.getName())) {
 
-			isClick.add(player.getName());
+			cantClick.add(player.getName());
 
 			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
 				public void run() {
 
-					isClick.remove(player.getName());
+					cantClick.remove(player.getName());
 
 				}
 
@@ -789,6 +668,13 @@ public class SpectateManager {
 
 	}
 
+	public void saveMultiInvState(Player p, Player target) {
+		if (!p.getWorld().getName().equals(target.getWorld().getName())) {
+			p.teleport(target.getWorld().getSpawnLocation());
+			multiInvStates.put(p, new PlayerState(p));
+		}
+	}
+
 	public void loadPlayerState(Player toPlayer) {
 
 		loadPlayerState(toPlayer, toPlayer);
@@ -848,27 +734,9 @@ public class SpectateManager {
 
 	}
 
-	public void setExperienceCooldown(Player p, int cooldown) {
-
-        try {
-
-            Method handle = p.getClass().getDeclaredMethod("getHandle");
-            Object entityPlayer = handle.invoke(p);
-            Field cooldownField = entityPlayer.getClass().getSuperclass().getDeclaredField("bu");
-            cooldownField.setAccessible(true);
-            cooldownField.setInt(entityPlayer, cooldown);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        }
-
-	}
-
 	public boolean isReadyForNextScroll(Player p) {
 
-		return !isClick.contains(p.getName());
+		return !cantClick.contains(p.getName());
 
 	}
 
@@ -885,6 +753,41 @@ public class SpectateManager {
 
 		}
 
+	}
+
+	private void teleport(Player p, Entity e) {
+		teleport(p, e.getLocation());
+	}
+
+	//Have to make a custom teleport method thanks to Acrobot
+	private void teleport(Player p, Location location) {
+		EntityPlayer entity = ((CraftPlayer) p).getHandle();
+
+		if (entity.dead) {
+			return;
+		}
+
+		if (entity.playerConnection == null || entity.playerConnection.isDisconnected()) {
+			return;
+		}
+
+		if (entity.passenger != null) {
+			return;
+		}
+
+		Location from = p.getLocation();
+		Location to = location;
+
+		entity.mount(null);
+
+		WorldServer fromWorld = ((CraftWorld) from.getWorld()).getHandle();
+		WorldServer toWorld = ((CraftWorld) to.getWorld()).getHandle();
+
+		if (fromWorld == toWorld) {
+			entity.playerConnection.teleport(to);
+		} else {
+			((CraftServer)Bukkit.getServer()).getHandle().moveToWorld(entity, toWorld.dimension, true, to, true);
+		}
 	}
 
 }

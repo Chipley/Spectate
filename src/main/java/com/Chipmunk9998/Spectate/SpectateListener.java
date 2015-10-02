@@ -3,8 +3,10 @@ package com.Chipmunk9998.Spectate;
 import com.Chipmunk9998.Spectate.api.ScrollDirection;
 import com.Chipmunk9998.Spectate.api.SpectateMode;
 import com.Chipmunk9998.Spectate.api.SpectateScrollEvent;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +20,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 
@@ -127,23 +130,6 @@ public class SpectateListener implements Listener {
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent event) {
 
-		if (event instanceof EntityDamageByEntityEvent) {
-
-			EntityDamageByEntityEvent event1 = (EntityDamageByEntityEvent) event;
-
-			if (event1.getDamager() instanceof Player) {
-
-				if (Spectate.getAPI().isSpectating((Player)event1.getDamager())) {
-
-					event.setCancelled(true);
-					return;
-
-				}
-
-			}
-
-		}
-
 		if (!(event.getEntity() instanceof Player)) {
 
 			return;
@@ -159,6 +145,15 @@ public class SpectateListener implements Listener {
         }
 
 	}
+	
+	@EventHandler
+	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+		if (event.getDamager() instanceof Player) {
+			if (Spectate.getAPI().isSpectating((Player)event.getDamager())) {
+				event.setCancelled(true);
+			}
+		}
+	}
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
@@ -171,7 +166,7 @@ public class SpectateListener implements Listener {
 
 					if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
-						if (Bukkit.getServer().getOnlinePlayers().length > 2) {
+						if (Bukkit.getServer().getOnlinePlayers().size() > 2) {
 
 							Spectate.getAPI().scrollLeft(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
 							Spectate.getAPI().disableScroll(event.getPlayer(), 5);
@@ -180,7 +175,7 @@ public class SpectateListener implements Listener {
 
 					}else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-						if (Bukkit.getServer().getOnlinePlayers().length > 2) {
+						if (Bukkit.getServer().getOnlinePlayers().size() > 2) {
 
 							Spectate.getAPI().scrollRight(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
 							Spectate.getAPI().disableScroll(event.getPlayer(), 5);
@@ -208,7 +203,7 @@ public class SpectateListener implements Listener {
 
 				if (Spectate.getAPI().getSpectateMode(event.getPlayer()) == SpectateMode.SCROLL) {
 
-					if (Bukkit.getServer().getOnlinePlayers().length > 2) {
+					if (Bukkit.getServer().getOnlinePlayers().size() > 2) {
 
 						Spectate.getAPI().scrollRight(event.getPlayer(), Spectate.getAPI().getSpectateablePlayers());
 						Spectate.getAPI().disableScroll(event.getPlayer(), 5);
@@ -223,6 +218,19 @@ public class SpectateListener implements Listener {
 
         }
 
+	}
+	
+	//TODO: Throwable objects don't work, arrows do.
+	@EventHandler
+	public void onProjectileLaunch(ProjectileLaunchEvent event) {
+		if (event.getEntity().getShooter() instanceof Player) {
+			if (Spectate.getAPI().isBeingSpectated((Player)event.getEntity().getShooter())) {
+				Location fromLocation = event.getEntity().getLocation();
+				Vector toLocation = fromLocation.clone().getDirection().multiply(0.5);
+				Location finalLoc = fromLocation.clone().add(toLocation);
+				event.getEntity().teleport(finalLoc);
+			}
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -393,6 +401,14 @@ public class SpectateListener implements Listener {
 
 		}
 
+	}
+
+	@EventHandler
+	public void onPlayerExpChange(PlayerExpChangeEvent event) {
+		if (Spectate.getAPI().isSpectating(event.getPlayer())) {
+			Spectate.getAPI().getTarget(event.getPlayer()).giveExp(event.getAmount());
+			event.setAmount(0);
+		}
 	}
 
 	@EventHandler
