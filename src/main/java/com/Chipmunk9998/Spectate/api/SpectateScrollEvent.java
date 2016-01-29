@@ -8,48 +8,32 @@ import org.bukkit.event.HandlerList;
 
 public class SpectateScrollEvent extends Event {
 
-	private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
 
-	private Player scroller;
-	private ArrayList<Player> scrollList;
-	private ScrollDirection direction;
+    private Player scroller;
+    private ArrayList<Player> scrollList;
+    private ScrollDirection direction;
 
-	public SpectateScrollEvent(Player scroller, ArrayList<Player> scrollList, ScrollDirection direction) {
+    public SpectateScrollEvent(Player scroller, ArrayList<Player> scrollList, ScrollDirection direction) {
+        this.scroller = scroller;
+        this.scrollList = scrollList;
+        this.direction = direction;
+    }
 
-		this.scroller = scroller;
-		this.scrollList = scrollList;
-		this.direction = direction;
+    public Player getPlayer() {
+        return scroller;
+    }
 
-	}
+    public ArrayList<Player> getSpectateList() {
+        return scrollList;
+    }
 
-	public Player getPlayer() {
+    public ScrollDirection getDirection() {
+        return direction;
+    }
 
-		return scroller;
-
-	}
-
-	public ArrayList<Player> getSpectateList() {
-
-		return scrollList;
-
-	}
-
-	public ScrollDirection getDirection() {
-
-		return direction;
-
-	}
-
-	public HandlerList getHandlers() {
-
-		return handlers;
-
-	}
-
-	public static HandlerList getHandlerList() {
-
-		return handlers;
-
-	}
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 
 }

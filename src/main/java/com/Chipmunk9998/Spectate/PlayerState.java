@@ -12,54 +12,44 @@ import org.bukkit.potion.PotionEffect;
 
 public class PlayerState {
 
-	public Player player;
-	public ItemStack[] inventory;
-	public ItemStack[] armor;
-	public int hunger;
-	public double health;
-	public int level;
-	public float exp;
-	public int slot;
-	public boolean allowFlight;
-	public boolean isFlying;
-	public GameMode mode;
-	public Location location;
-	
-	public Collection<PotionEffect> potions;
+    public Player player;
+    public ItemStack[] inventory;
+    public ItemStack[] armor;
+    public int hunger;
+    public double health;
+    public int level;
+    public float exp;
+    public int slot;
+    public boolean allowFlight;
+    public boolean isFlying;
+    public GameMode mode;
+    public Location location;
 
-	public ArrayList<Player> vanishedFrom = new ArrayList<Player>();
+    public Collection<PotionEffect> potions;
 
-	public PlayerState(Player p) {
+    public ArrayList<Player> vanishedFrom = new ArrayList<Player>();
 
-		player = p;
-		inventory = p.getInventory().getContents();
-		armor = p.getInventory().getArmorContents();
-		hunger = p.getFoodLevel();
-		health = p.getHealth();
-		level = p.getLevel();
-		exp = p.getExp();
-		slot = p.getInventory().getHeldItemSlot();
-		allowFlight = p.getAllowFlight();
-		isFlying = p.isFlying();
-		mode = p.getGameMode();
-		location = p.getLocation();
-		
-		potions = p.getActivePotionEffects();
-
-		for (Player players : Bukkit.getServer().getOnlinePlayers()) {
-
-			if (players != p) {
-
-				if (!players.canSee(p)) {
-
-					vanishedFrom.add(players);
-
-				}
-
-			}
-
-		}
-
-	}
+    public PlayerState(Player p) {
+        player = p;
+        inventory = p.getInventory().getContents();
+        armor = p.getInventory().getArmorContents();
+        hunger = p.getFoodLevel();
+        health = p.getHealth();
+        level = p.getLevel();
+        exp = p.getExp();
+        slot = p.getInventory().getHeldItemSlot();
+        allowFlight = p.getAllowFlight();
+        isFlying = p.isFlying();
+        mode = p.getGameMode();
+        location = p.getLocation();
+        potions = p.getActivePotionEffects();
+        for (Player players : Bukkit.getServer().getOnlinePlayers()) {
+            if (players != p) {
+                if (!players.canSee(p)) {
+                    vanishedFrom.add(players);
+                }
+            }
+        }
+    }
 
 }
