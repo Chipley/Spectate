@@ -72,6 +72,9 @@ public class SpectateManager {
                             p.getInventory().setArmorContents(getTarget(p).getInventory().getArmorContents());
                             p.setItemOnCursor(getTarget(p).getItemOnCursor());
                         }
+                        if (getTarget(p).getMaxHealth() != p.getMaxHealth()) {
+                            p.setMaxHealth(getTarget(p).getMaxHealth());
+                        }
                         if (getTarget(p).getHealth() == 0) {
                             p.setHealth(1);
                         } else {
@@ -152,6 +155,7 @@ public class SpectateManager {
         }
 
         p.setPlayerListName(playerListName);
+        p.setMaxHealth(target.getMaxHealth());
         p.setHealth(target.getHealth());
         p.teleport(target);
 
@@ -459,6 +463,7 @@ public class SpectateManager {
         toPlayer.getInventory().setContents(state.inventory);
         toPlayer.getInventory().setArmorContents(state.armor);
         toPlayer.setFoodLevel(state.hunger);
+        toPlayer.setMaxHealth(state.maxHealth);
         toPlayer.setHealth(state.health);
         toPlayer.setLevel(state.level);
         toPlayer.setExp(state.exp);

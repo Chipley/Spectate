@@ -13,9 +13,9 @@ import java.io.IOException;
 
 public class Spectate extends JavaPlugin {
 
-    //TODO: (IN THE FUTURE - DON'T HAVE TIME FOR THIS RIGHT NOW) Control command
+    //TODO: Control command?
 
-    /* Submit this to spigot in the CraftPlayer class \/
+    /* Submit this to spigot in the CraftPlayer class in the teleport method \/
     if (!this.getHandle().activeContainer.a(this.getHandle())) {
         if (getHandle().activeContainer != this.getHandle().defaultContainer) {
             this.getHandle().closeInventory();
@@ -26,6 +26,8 @@ public class Spectate extends JavaPlugin {
     //TODO: Figure out why the crafting bench behaves weird and make a pull request for that too
 
     //TODO: Fix projectiles launched by a player getting stopped by the spectator
+    
+    //TODO: Set the player's skin to the person they're spectating
 
     private static SpectateManager Manager;
 

@@ -16,6 +16,7 @@ public class PlayerState {
     public ItemStack[] inventory;
     public ItemStack[] armor;
     public int hunger;
+    public double maxHealth;
     public double health;
     public int level;
     public float exp;
@@ -34,6 +35,7 @@ public class PlayerState {
         inventory = p.getInventory().getContents();
         armor = p.getInventory().getArmorContents();
         hunger = p.getFoodLevel();
+        maxHealth = p.getMaxHealth();
         health = p.getHealth();
         level = p.getLevel();
         exp = p.getExp();
