@@ -36,4 +36,8 @@ public class SpectateScrollEvent extends Event {
         return handlers;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
 }
