@@ -1,8 +1,8 @@
-package com.Chipmunk9998.Spectate;
+package com.chipmunk9998.spectate;
 
-import com.Chipmunk9998.Spectate.api.ScrollDirection;
-import com.Chipmunk9998.Spectate.api.SpectateMode;
-import com.Chipmunk9998.Spectate.api.SpectateScrollEvent;
+import com.chipmunk9998.spectate.api.ScrollDirection;
+import com.chipmunk9998.spectate.api.SpectateMode;
+import com.chipmunk9998.spectate.api.SpectateScrollEvent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
