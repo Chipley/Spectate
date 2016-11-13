@@ -1,5 +1,5 @@
 name: Spectate
-main: com.Chipmunk9998.Spectate.Spectate
+main: com.chipmunk9998.spectate.Spectate
 version: 2.3
 commands:
     spectate:

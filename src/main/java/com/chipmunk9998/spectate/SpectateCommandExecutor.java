@@ -1,14 +1,13 @@
-package com.Chipmunk9998.Spectate;
+package com.chipmunk9998.spectate;
 
+import com.chipmunk9998.spectate.api.SpectateAngle;
+import com.chipmunk9998.spectate.api.SpectateMode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import com.Chipmunk9998.Spectate.api.SpectateAngle;
-import com.Chipmunk9998.Spectate.api.SpectateMode;
 
 public class SpectateCommandExecutor implements CommandExecutor {
 

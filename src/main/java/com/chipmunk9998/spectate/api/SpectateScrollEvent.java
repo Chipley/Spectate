@@ -1,4 +1,4 @@
-package com.Chipmunk9998.Spectate.api;
+package com.chipmunk9998.spectate.api;
 
 import java.util.ArrayList;
 

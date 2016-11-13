@@ -1,6 +1,6 @@
-package com.Chipmunk9998.Spectate;
+package com.chipmunk9998.spectate;
 
-import com.Chipmunk9998.Spectate.api.SpectateManager;
+import com.chipmunk9998.spectate.api.SpectateManager;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;

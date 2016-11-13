@@ -1,7 +1,7 @@
-package com.Chipmunk9998.Spectate.api;
+package com.chipmunk9998.spectate.api;
 
-import com.Chipmunk9998.Spectate.PlayerState;
-import com.Chipmunk9998.Spectate.Spectate;
+import com.chipmunk9998.spectate.PlayerState;
+import com.chipmunk9998.spectate.Spectate;
 
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.WorldServer;
